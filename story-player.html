@@ -578,34 +578,37 @@
                 }
             });
             
-            // Update story cover image - 修复图片路径问题
-            const coverImg = document.getElementById('story-cover');
-            let coverImage = story.cover || story.coverImage;
-            
-            // 如果封面地址不是以 http 开头，则添加根路径 /
-            if (coverImage && !coverImage.startsWith('http') && !coverImage.startsWith('/')) {
+            // 更新封面图片处理逻辑 - 修复各种图片路径类型
+            let coverImage = story.cover || story.coverImage || '/covers/default.jpg';
+            if (
+                coverImage &&
+                !coverImage.startsWith('http') &&
+                !coverImage.startsWith('https') &&
+                !coverImage.startsWith('data:') &&
+                !coverImage.startsWith('/')
+            ) {
                 coverImage = '/' + coverImage;
-            } else if (!coverImage) {
-                coverImage = 'https://images.unsplash.com/photo-1527409335569-f0e5c91fa707?ixlib=rb-1.2.1&auto=format&fit=crop&w=1050&q=80';
             }
-            
+            const coverImg = document.getElementById('story-cover');
             coverImg.src = coverImage;
             coverImg.alt = story.title;
-            
-            // 添加错误处理
-            coverImg.onerror = function() {
-                this.src = '/covers/default.jpg';
+            coverImg.onerror = () => {
+                coverImg.src = '/covers/default.jpg';
             };
             
-            const titleElement = document.createElement('div');
-            titleElement.className = 'suggestion-title';
-            titleElement.textContent = story.title;
+            // Update story metadata
+            document.getElementById('read-time').textContent = `${Math.ceil(story.content.length / 1000)} min read`;
+            document.getElementById('age-range').textContent = story.ageRange || 'Ages 2-5';
             
-            imageContainer.appendChild(image);
-            suggestionElement.appendChild(imageContainer);
-            suggestionElement.appendChild(titleElement);
+            // Show story container and hide loading indicator
+            document.getElementById('story-container').style.display = 'block';
+            document.getElementById('loading-indicator').style.display = 'none';
             
-            return suggestionElement;
+            // Update page title
+            document.title = `${story.title} - DreamTalk Box`;
+            
+            // Load story suggestions
+            loadStorySuggestions(story.id);
         }
         
         /**
