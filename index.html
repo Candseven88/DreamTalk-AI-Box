@@ -507,37 +507,76 @@
     </script>
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
-          const storyList = document.getElementById('storyList');
-        
-          try {
-            const response = await fetch('stories.json');
-            const stories = await response.json();
-        
-            storyList.innerHTML = ''; // 清空占位内容
-        
-            stories.slice(0, 8).forEach(story => {
-              const card = document.createElement('div');
-              card.className = 'story-card';
-              card.onclick = () => location.href = `story-player.html?id=${story.id}`;
-              card.innerHTML = `
-                <div class="story-image">
-                  <img src="${story.cover}" alt="${story.title}">
-                </div>
-                <div class="story-content">
-                  <h3 class="story-title">${story.title}</h3>
-                  <p class="story-description">${story.content.substring(0, 100)}...</p>
-                  <div class="story-footer">
-                    <span class="story-age">Age 3+</span>
-                    <i class="fas fa-play-circle story-play"></i>
-                  </div>
-                </div>
-              `;
-              storyList.appendChild(card);
-            });
-          } catch (err) {
-            console.error('Failed to load stories:', err);
-            storyList.innerHTML = '<p>Failed to load stories. Please try again later.</p>';
-          }
+            const storyList = document.getElementById('storyList');
+            
+            try {
+                // 1. 加载系统故事
+                const response = await fetch('stories.json');
+                const systemStories = await response.json();
+                
+                // 2. 加载用户故事
+                let userStories = [];
+                try {
+                    const userStoriesData = localStorage.getItem('userStories');
+                    if (userStoriesData) {
+                        userStories = JSON.parse(userStoriesData);
+                    }
+                } catch (error) {
+                    console.warn('Failed to load user stories:', error);
+                    // 如果解析失败，继续使用空数组
+                }
+                
+                // 3. 合并故事并限制数量为8个
+                // 系统故事优先，然后是用户故事
+                const allStories = [...systemStories, ...userStories].slice(0, 8);
+                
+                // 清空占位内容
+                storyList.innerHTML = '';
+                
+                // 4. 渲染故事卡片
+                allStories.forEach(story => {
+                    const card = document.createElement('div');
+                    card.className = 'story-card';
+                    
+                    // 设置点击事件
+                    card.onclick = () => location.href = `story-player.html?id=${story.id}`;
+                    
+                    // 处理封面图片 - 系统故事可能使用 cover 或 coverImage
+                    const coverImage = story.cover || story.coverImage || 'covers/default.jpg';
+                    
+                    // 处理故事内容 - 确保有内容且截取前100个字符
+                    const content = story.content ? story.content.substring(0, 100) + '...' : 'No description available...';
+                    
+                    // 处理年龄范围
+                    const ageRange = story.ageRange || 'Age 3+';
+                    
+                    // 构建卡片HTML
+                    card.innerHTML = `
+                        <div class="story-image">
+                            <img src="${coverImage}" alt="${story.title}" onerror="this.src='covers/default.jpg'">
+                        </div>
+                        <div class="story-content">
+                            <h3 class="story-title">${story.title}</h3>
+                            <p class="story-description">${content}</p>
+                            <div class="story-footer">
+                                <span class="story-age">${ageRange}</span>
+                                <i class="fas fa-play-circle story-play"></i>
+                            </div>
+                        </div>
+                    `;
+                    
+                    storyList.appendChild(card);
+                });
+                
+                // 如果没有故事可显示
+                if (allStories.length === 0) {
+                    storyList.innerHTML = '<p style="text-align: center; width: 100%;">No stories available. Try adding your own!</p>';
+                }
+                
+            } catch (err) {
+                console.error('Failed to load stories:', err);
+                storyList.innerHTML = '<p style="text-align: center; width: 100%;">Failed to load stories. Please try again later.</p>';
+            }
         });
         </script>
 </body>
