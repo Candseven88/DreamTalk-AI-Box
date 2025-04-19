@@ -574,6 +574,7 @@
             }
             
             // Function to create a story card
+            // 在创建故事卡片的函数中，修改图片路径处理逻辑
             function createStoryCard(story) {
                 const storyCard = document.createElement('div');
                 storyCard.className = 'story-card';
@@ -595,17 +596,19 @@
                 imageContainer.className = 'story-image';
                 
                 const image = document.createElement('img');
-                // Handle different cover image formats (URL or Base64)
-                if (story.isCustom) {
-                    image.src = story.cover || 'covers/default.jpg';
-                } else {
-                    image.src = story.coverImage || 'covers/default.jpg';
+                
+                // 修复图片路径问题：如果不是以 http 开头，则添加根路径 /
+                let coverImage = story.cover || story.coverImage || 'covers/default.jpg';
+                if (coverImage && !coverImage.startsWith('http') && !coverImage.startsWith('/')) {
+                    coverImage = '/' + coverImage;
                 }
+                
+                image.src = coverImage;
                 image.alt = story.title;
                 
                 // Handle image load error
                 image.onerror = function() {
-                    this.src = 'covers/default.jpg';
+                    this.src = '/covers/default.jpg';  // 同样修复默认图片路径
                 };
                 
                 imageContainer.appendChild(image);

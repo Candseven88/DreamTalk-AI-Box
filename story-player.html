@@ -578,96 +578,24 @@
                 }
             });
             
-            // Update story cover image
+            // Update story cover image - 修复图片路径问题
             const coverImg = document.getElementById('story-cover');
-            coverImg.src = story.cover || 'https://images.unsplash.com/photo-1527409335569-f0e5c91fa707?ixlib=rb-1.2.1&auto=format&fit=crop&w=1050&q=80';
+            let coverImage = story.cover || story.coverImage;
+            
+            // 如果封面地址不是以 http 开头，则添加根路径 /
+            if (coverImage && !coverImage.startsWith('http') && !coverImage.startsWith('/')) {
+                coverImage = '/' + coverImage;
+            } else if (!coverImage) {
+                coverImage = 'https://images.unsplash.com/photo-1527409335569-f0e5c91fa707?ixlib=rb-1.2.1&auto=format&fit=crop&w=1050&q=80';
+            }
+            
+            coverImg.src = coverImage;
             coverImg.alt = story.title;
             
-            // Estimate reading time (rough estimate: 200 words per minute)
-            const wordCount = story.content.split(/\s+/).length;
-            const readingTimeMinutes = Math.max(1, Math.ceil(wordCount / 200));
-            document.getElementById('read-time').textContent = `${readingTimeMinutes} min read`;
-            
-            // Clear status
-            updateStatus('');
-        }
-        
-        /**
-         * Load story suggestions from system stories
-         * @param {string} currentStoryId - The ID of the current story (to exclude from suggestions)
-         */
-        function loadStorySuggestions(currentStoryId) {
-            if (!allStories || allStories.length === 0) {
-                loadSystemStoriesForSuggestions();
-                return;
-            }
-            
-            const suggestionsContainer = document.getElementById('story-suggestions');
-            suggestionsContainer.innerHTML = '';
-            
-            // Filter out current story and get up to 4 random stories
-            const otherStories = allStories.filter(story => story.id !== currentStoryId);
-            const shuffled = otherStories.sort(() => 0.5 - Math.random());
-            const selectedStories = shuffled.slice(0, 4);
-            
-            // Create suggestion elements
-            selectedStories.forEach(story => {
-                const suggestionElement = createStorySuggestion(story);
-                suggestionsContainer.appendChild(suggestionElement);
-            });
-        }
-        
-        /**
-         * Load system stories for suggestions when viewing a user story
-         */
-        async function loadSystemStoriesForSuggestions() {
-            try {
-                // Fetch stories.json if not already loaded
-                if (!allStories || allStories.length === 0) {
-                    const response = await fetch('stories.json');
-                    if (!response.ok) {
-                        throw new Error(`Failed to fetch stories: ${response.status}`);
-                    }
-                    
-                    allStories = await response.json();
-                }
-                
-                // Get up to 4 random stories for suggestions
-                const shuffled = allStories.sort(() => 0.5 - Math.random());
-                const selectedStories = shuffled.slice(0, 4);
-                
-                // Display suggestions
-                const suggestionsContainer = document.getElementById('story-suggestions');
-                suggestionsContainer.innerHTML = '';
-                
-                selectedStories.forEach(story => {
-                    const suggestionElement = createStorySuggestion(story);
-                    suggestionsContainer.appendChild(suggestionElement);
-                });
-                
-            } catch (error) {
-                console.error('Error loading story suggestions:', error);
-            }
-        }
-        
-        /**
-         * Create a story suggestion element
-         * @param {Object} story - The story object for the suggestion
-         * @returns {HTMLElement} The story suggestion element
-         */
-        function createStorySuggestion(story) {
-            const suggestionElement = document.createElement('div');
-            suggestionElement.className = 'story-suggestion';
-            suggestionElement.onclick = function() {
-                location.href = `story-player.html?id=${story.id}`;
+            // 添加错误处理
+            coverImg.onerror = function() {
+                this.src = '/covers/default.jpg';
             };
-            
-            const imageContainer = document.createElement('div');
-            imageContainer.className = 'suggestion-image';
-            
-            const image = document.createElement('img');
-            image.src = story.cover || 'https://images.unsplash.com/photo-1527409335569-f0e5c91fa707?ixlib=rb-1.2.1&auto=format&fit=crop&w=1050&q=80';
-            image.alt = story.title;
             
             const titleElement = document.createElement('div');
             titleElement.className = 'suggestion-title';
