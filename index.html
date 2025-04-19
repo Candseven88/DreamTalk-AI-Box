@@ -506,97 +506,39 @@
         
     </script>
     <script>
-        // 在页面加载完成后执行
-        document.addEventListener('DOMContentLoaded', function() {
-        // 加载故事数据
-        loadStories();
+        document.addEventListener('DOMContentLoaded', async () => {
+          const storyList = document.getElementById('storyList');
         
-        // 其他初始化代码...
+          try {
+            const response = await fetch('stories.json');
+            const stories = await response.json();
+        
+            storyList.innerHTML = ''; // 清空占位内容
+        
+            stories.slice(0, 8).forEach(story => {
+              const card = document.createElement('div');
+              card.className = 'story-card';
+              card.onclick = () => location.href = `story-player.html?id=${story.id}`;
+              card.innerHTML = `
+                <div class="story-image">
+                  <img src="${story.cover}" alt="${story.title}">
+                </div>
+                <div class="story-content">
+                  <h3 class="story-title">${story.title}</h3>
+                  <p class="story-description">${story.content.substring(0, 100)}...</p>
+                  <div class="story-footer">
+                    <span class="story-age">Age 3+</span>
+                    <i class="fas fa-play-circle story-play"></i>
+                  </div>
+                </div>
+              `;
+              storyList.appendChild(card);
+            });
+          } catch (err) {
+            console.error('Failed to load stories:', err);
+            storyList.innerHTML = '<p>Failed to load stories. Please try again later.</p>';
+          }
         });
-        
-        // 加载故事数据（系统故事 + 用户故事）
-        function loadStories() {
-        // 获取故事列表容器
-        const storyListContainer = document.getElementById('storyList');
-        
-        // 首先尝试从localStorage获取用户故事
-        const userStories = JSON.parse(localStorage.getItem('userStories')) || [];
-        
-        // 然后获取系统故事
-        fetch('stories.json')
-        .then(response => response.json())
-        .then(systemStories => {
-        // 合并系统故事和用户故事
-        let allStories = [...systemStories];
-        
-        // 如果有用户故事，添加到合并列表中
-        if (userStories.length > 0) {
-        allStories = [...allStories, ...userStories];
-        }
-        
-        // 限制展示的故事数量为8个
-        const storiesToShow = allStories.slice(0, 8);
-        
-        // 清空故事列表容器
-        storyListContainer.innerHTML = '';
-        
-        // 创建故事卡片并添加到容器中
-        storiesToShow.forEach(story => {
-        const storyCard = createStoryCard(story);
-        storyListContainer.appendChild(storyCard);
-        });
-        })
-        .catch(error => {
-        console.error('Error loading stories:', error);
-        storyListContainer.innerHTML = '<p class="error-message">Failed to load stories. Please try again later.</p>';
-        });
-        }
-        
-        // 创建故事卡片元素
-        function createStoryCard(story) {
-        // 创建故事卡片容器
-        const card = document.createElement('div');
-        card.className = 'story-card';
-        card.onclick = function() {
-        window.location.href = `story-player.html?id=${story.id}`;
-        };
-        
-        // 创建故事封面图片
-        const coverImage = document.createElement('div');
-        coverImage.className = 'story-cover';
-        
-        const img = document.createElement('img');
-        // 使用故事的cover属性，如果没有则使用默认图片
-        img.src = story.cover || story.coverImage || 'https://via.placeholder.com/300x200?text=Story';
-        img.alt = story.title;
-        
-        coverImage.appendChild(img);
-        
-        // 创建故事信息容器
-        const storyInfo = document.createElement('div');
-        storyInfo.className = 'story-info';
-        
-        // 创建故事标题
-        const title = document.createElement('h3');
-        title.className = 'story-title';
-        title.textContent = story.title;
-        
-        // 创建故事简介
-        const description = document.createElement('p');
-        description.className = 'story-description';
-        // 截取内容的前100个字符作为简介
-        description.textContent = story.content.substring(0, 100) + (story.content.length > 100 ? '...' : '');
-        
-        // 将元素添加到卡片中
-        storyInfo.appendChild(title);
-        storyInfo.appendChild(description);
-        
-        card.appendChild(coverImage);
-        card.appendChild(storyInfo);
-        
-        return card;
-        }
-        
         </script>
 </body>
 </html>

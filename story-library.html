@@ -437,362 +437,371 @@
     
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // 全局变量
-            let allStories = []; // 存储所有故事（系统 + 用户）
-            let filteredStories = []; // 存储筛选后的故事
-            let currentPage = 1; // 当前页码
-            const storiesPerPage = 8; // 每页显示的故事数量
+            // Global variables
+            const storiesPerPage = 8;
+            let allStories = [];
+            let filteredStories = [];
+            let currentPage = 1;
+            let totalPages = 0;
             
-            // 页面加载完成后执行
-            document.addEventListener('DOMContentLoaded', function() {
-                // 加载所有故事
-                loadAllStories();
-                
-                // 设置搜索和筛选事件监听器
-                setupEventListeners();
+            // Load stories from JSON file and localStorage
+            loadStories();
+            
+            // Filter options functionality
+            const filterOptions = document.querySelectorAll('.filter-option');
+            
+            filterOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    // Remove active class from all options
+                    filterOptions.forEach(opt => opt.classList.remove('active'));
+                    
+                    // Add active class to clicked option
+                    this.classList.add('active');
+                    
+                    // Filter stories based on the selected option
+                    const filter = this.textContent.trim();
+                    filterStories(filter);
+                });
             });
             
-            // 加载所有故事（系统 + 用户）
-            function loadAllStories() {
-                // 显示加载指示器
-                document.getElementById('loading-indicator').style.display = 'block';
-                
-                // 获取用户故事
-                const userStories = JSON.parse(localStorage.getItem('userStories')) || [];
-                
-                // 获取系统故事
-                fetch('stories.json')
-                    .then(response => response.json())
-                    .then(systemStories => {
-                        // 合并系统故事和用户故事
-                        allStories = [...systemStories, ...userStories];
-                        
-                        // 初始化筛选后的故事为所有故事
-                        filteredStories = [...allStories];
-                        
-                        // 更新分类选项
-                        updateCategoryOptions();
-                        
-                        // 更新年龄范围选项
-                        updateAgeRangeOptions();
-                        
-                        // 显示第一页故事
-                        displayStories(1);
-                        
-                        // 隐藏加载指示器
-                        document.getElementById('loading-indicator').style.display = 'none';
-                    })
-                    .catch(error => {
-                        console.error('Error loading stories:', error);
-                        document.getElementById('stories-container').innerHTML = 
-                            '<p class="error-message">Failed to load stories. Please try again later.</p>';
-                        document.getElementById('loading-indicator').style.display = 'none';
-                    });
-            }
+            // Search functionality
+            const searchInput = document.querySelector('.search-box input');
             
-            // 设置事件监听器
-            function setupEventListeners() {
-                // 搜索框事件监听
-                const searchInput = document.getElementById('search-input');
-                searchInput.addEventListener('input', function() {
-                    filterStories();
-                });
+            searchInput.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
                 
-                // 分类筛选事件监听
-                const categoryFilter = document.getElementById('category-filter');
-                categoryFilter.addEventListener('change', function() {
-                    filterStories();
-                });
-                
-                // 年龄范围筛选事件监听
-                const ageRangeFilter = document.getElementById('age-range-filter');
-                ageRangeFilter.addEventListener('change', function() {
-                    filterStories();
-                });
-            }
-            
-            // 更新分类选项
-            function updateCategoryOptions() {
-                const categoryFilter = document.getElementById('category-filter');
-                const categories = new Set();
-                
-                // 添加"All Categories"选项
-                categories.add('All Categories');
-                
-                // 从所有故事中收集唯一的分类
-                allStories.forEach(story => {
-                    if (story.category) {
-                        categories.add(story.category);
-                    }
-                });
-                
-                // 清空现有选项
-                categoryFilter.innerHTML = '';
-                
-                // 添加新选项
-                categories.forEach(category => {
-                    const option = document.createElement('option');
-                    option.value = category;
-                    option.textContent = category;
-                    categoryFilter.appendChild(option);
-                });
-            }
-            
-            // 更新年龄范围选项
-            function updateAgeRangeOptions() {
-                const ageRangeFilter = document.getElementById('age-range-filter');
-                const ageRanges = new Set();
-                
-                // 添加"All Ages"选项
-                ageRanges.add('All Ages');
-                
-                // 从所有故事中收集唯一的年龄范围
-                allStories.forEach(story => {
-                    if (story.ageRange) {
-                        ageRanges.add(story.ageRange);
-                    }
-                });
-                
-                // 清空现有选项
-                ageRangeFilter.innerHTML = '';
-                
-                // 添加新选项
-                ageRanges.forEach(ageRange => {
-                    const option = document.createElement('option');
-                    option.value = ageRange;
-                    option.textContent = ageRange;
-                    ageRangeFilter.appendChild(option);
-                });
-            }
-            
-            // 筛选故事
-            function filterStories() {
-                const searchTerm = document.getElementById('search-input').value.toLowerCase();
-                const selectedCategory = document.getElementById('category-filter').value;
-                const selectedAgeRange = document.getElementById('age-range-filter').value;
-                
-                // 筛选故事
-                filteredStories = allStories.filter(story => {
-                    // 搜索标题和内容
-                    const matchesSearch = 
-                        story.title.toLowerCase().includes(searchTerm) || 
-                        story.content.toLowerCase().includes(searchTerm);
-                    
-                    // 筛选分类
-                    const matchesCategory = 
-                        selectedCategory === 'All Categories' || 
-                        story.category === selectedCategory;
-                    
-                    // 筛选年龄范围
-                    const matchesAgeRange = 
-                        selectedAgeRange === 'All Ages' || 
-                        story.ageRange === selectedAgeRange;
-                    
-                    // 返回同时满足所有条件的故事
-                    return matchesSearch && matchesCategory && matchesAgeRange;
-                });
-                
-                // 重置为第一页并显示筛选后的故事
-                displayStories(1);
-            }
-            
-            // 显示指定页的故事
-            function displayStories(page) {
-                currentPage = page;
-                
-                // 计算当前页的故事范围
-                const startIndex = (page - 1) * storiesPerPage;
-                const endIndex = startIndex + storiesPerPage;
-                const currentPageStories = filteredStories.slice(startIndex, endIndex);
-                
-                // 获取故事容器
-                const storiesContainer = document.getElementById('stories-container');
-                
-                // 清空容器
-                storiesContainer.innerHTML = '';
-                
-                // 如果没有故事，显示提示信息
-                if (currentPageStories.length === 0) {
-                    storiesContainer.innerHTML = '<p class="no-stories-message">No stories found matching your criteria.</p>';
-                    document.getElementById('pagination').style.display = 'none';
+                if (searchTerm === '') {
+                    // If search is cleared, reset to current filter
+                    const activeFilter = document.querySelector('.filter-option.active').textContent.trim();
+                    filterStories(activeFilter);
                     return;
                 }
                 
-                // 创建故事卡片并添加到容器
-                currentPageStories.forEach(story => {
-                    const storyCard = createStoryCard(story);
-                    storiesContainer.appendChild(storyCard);
+                // Filter stories based on search term
+                filteredStories = allStories.filter(story => {
+                    const title = story.title.toLowerCase();
+                    const content = story.content ? story.content.toLowerCase() : '';
+                    return title.includes(searchTerm) || content.includes(searchTerm);
                 });
                 
-                // 更新分页
+                // Reset to first page and update display
+                currentPage = 1;
                 updatePagination();
+                displayStories();
+            });
+            
+            // Function to load stories from stories.json and localStorage
+            async function loadStories() {
+                const storyGrid = document.getElementById('storyList');
+                const loadingElement = document.getElementById('loading');
+                
+                try {
+                    // Load system stories from JSON file
+                    const response = await fetch('stories.json');
+                    
+                    if (!response.ok) {
+                        throw new Error('Failed to load stories');
+                    }
+                    
+                    const systemStories = await response.json();
+                    
+                    // Load user stories from localStorage
+                    const userStories = JSON.parse(localStorage.getItem('userStories')) || [];
+                    
+                    // Mark system stories and user stories
+                    systemStories.forEach(story => {
+                        story.isCustom = false;
+                    });
+                    
+                    userStories.forEach(story => {
+                        story.isCustom = true;
+                    });
+                    
+                    // Combine system and user stories
+                    allStories = [...systemStories, ...userStories];
+                    filteredStories = [...allStories]; // Create a copy for filtering
+                    
+                    // Hide loading indicator
+                    loadingElement.style.display = 'none';
+                    
+                    // Calculate total pages
+                    updatePagination();
+                    
+                    // Display first page of stories
+                    displayStories();
+                    
+                } catch (error) {
+                    console.error('Error loading stories:', error);
+                    
+                    // Try to load user stories if system stories fail
+                    try {
+                        const userStories = JSON.parse(localStorage.getItem('userStories')) || [];
+                        userStories.forEach(story => {
+                            story.isCustom = true;
+                        });
+                        
+                        if (userStories.length > 0) {
+                            allStories = [...userStories];
+                            filteredStories = [...allStories];
+                            
+                            // Hide loading indicator
+                            loadingElement.style.display = 'none';
+                            
+                            // Calculate total pages
+                            updatePagination();
+                            
+                            // Display first page of stories
+                            displayStories();
+                            return;
+                        }
+                    } catch (e) {
+                        console.error('Error loading user stories:', e);
+                    }
+                    
+                    // Hide loading indicator
+                    loadingElement.style.display = 'none';
+                    
+                    // Show error message
+                    const errorMessage = document.createElement('div');
+                    errorMessage.className = 'error-message';
+                    errorMessage.textContent = 'Failed to load stories. Please try again later.';
+                    storyGrid.innerHTML = '';
+                    storyGrid.appendChild(errorMessage);
+                    
+                    // Hide pagination
+                    document.getElementById('pagination').style.display = 'none';
+                }
             }
             
-            // 创建故事卡片
+            // Function to create a story card
             function createStoryCard(story) {
-                // 创建卡片容器
-                const card = document.createElement('div');
-                card.className = 'story-card';
-                card.onclick = function() {
+                const storyCard = document.createElement('div');
+                storyCard.className = 'story-card';
+                storyCard.setAttribute('data-id', story.id);
+                
+                // Add click event to navigate to story player
+                storyCard.addEventListener('click', function() {
                     window.location.href = `story-player.html?id=${story.id}`;
+                });
+                
+                // Create badge
+                const badge = document.createElement('div');
+                badge.className = story.isCustom ? 'story-badge custom' : 'story-badge';
+                badge.textContent = story.isCustom ? 'Custom' : 'System';
+                storyCard.appendChild(badge);
+                
+                // Create image container
+                const imageContainer = document.createElement('div');
+                imageContainer.className = 'story-image';
+                
+                const image = document.createElement('img');
+                // Handle different cover image formats (URL or Base64)
+                if (story.isCustom) {
+                    image.src = story.cover || 'covers/default.jpg';
+                } else {
+                    image.src = story.coverImage || 'covers/default.jpg';
+                }
+                image.alt = story.title;
+                
+                // Handle image load error
+                image.onerror = function() {
+                    this.src = 'covers/default.jpg';
                 };
                 
-                // 创建封面图片
-                const coverContainer = document.createElement('div');
-                coverContainer.className = 'story-cover';
+                imageContainer.appendChild(image);
+                storyCard.appendChild(imageContainer);
                 
-                const coverImage = document.createElement('img');
-                // 使用故事的cover属性，如果没有则使用coverImage或默认图片
-                coverImage.src = story.cover || story.coverImage || 'https://via.placeholder.com/300x200?text=Story';
-                coverImage.alt = story.title;
+                // Create content container
+                const contentContainer = document.createElement('div');
+                contentContainer.className = 'story-content';
                 
-                coverContainer.appendChild(coverImage);
-                
-                // 创建故事信息区域
-                const infoContainer = document.createElement('div');
-                infoContainer.className = 'story-info';
-                
-                // 创建标题
+                // Add title
                 const title = document.createElement('h3');
                 title.className = 'story-title';
                 title.textContent = story.title;
+                contentContainer.appendChild(title);
                 
-                // 创建元数据（分类和年龄范围）
-                const metadata = document.createElement('div');
-                metadata.className = 'story-metadata';
+                // Add meta info
+                const meta = document.createElement('div');
+                meta.className = 'story-meta';
                 
-                if (story.category) {
-                    const category = document.createElement('span');
-                    category.className = 'story-category';
-                    category.textContent = story.category;
-                    metadata.appendChild(category);
+                const ageSpan = document.createElement('span');
+                ageSpan.textContent = story.ageRange || 'All Ages';
+                meta.appendChild(ageSpan);
+                
+                const category = document.createElement('div');
+                category.className = 'story-category';
+                category.textContent = story.category || 'Bedtime';
+                meta.appendChild(category);
+                
+                contentContainer.appendChild(meta);
+                
+                // Add story preview
+                if (story.content) {
+                    const preview = document.createElement('p');
+                    preview.className = 'story-preview';
+                    preview.textContent = story.content.substring(0, 80) + '...';
+                    contentContainer.appendChild(preview);
                 }
                 
-                if (story.ageRange) {
-                    const ageRange = document.createElement('span');
-                    ageRange.className = 'story-age';
-                    ageRange.textContent = story.ageRange;
-                    metadata.appendChild(ageRange);
-                }
+                // Add actions
+                const actions = document.createElement('div');
+                actions.className = 'story-actions';
                 
-                // 创建简介
-                const description = document.createElement('p');
-                description.className = 'story-description';
-                // 截取内容的前100个字符作为简介
-                description.textContent = story.content.substring(0, 100) + (story.content.length > 100 ? '...' : '');
+                const playButton = document.createElement('div');
+                playButton.className = 'story-play';
+                playButton.innerHTML = '<i class="fas fa-play"></i>';
+                actions.appendChild(playButton);
                 
-                // 将元素添加到信息容器
-                infoContainer.appendChild(title);
-                infoContainer.appendChild(metadata);
-                infoContainer.appendChild(description);
+                const options = document.createElement('div');
+                options.className = 'story-options';
+                options.innerHTML = '<i class="fas fa-ellipsis-v"></i>';
                 
-                // 将元素添加到卡片
-                card.appendChild(coverContainer);
-                card.appendChild(infoContainer);
+                // Prevent propagation for options button
+                options.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    // Options menu functionality could be added here
+                });
                 
-                return card;
+                actions.appendChild(options);
+                contentContainer.appendChild(actions);
+                
+                storyCard.appendChild(contentContainer);
+                
+                return storyCard;
             }
             
-            // 更新分页
-            function updatePagination() {
-                const totalPages = Math.ceil(filteredStories.length / storiesPerPage);
-                const pagination = document.getElementById('pagination');
+            // Function to filter stories
+            function filterStories(filter) {
+                if (filter === 'All Stories') {
+                    filteredStories = [...allStories];
+                } else {
+                    filteredStories = allStories.filter(story => {
+                        // Get category and age range from story
+                        const category = story.category || 'Bedtime';
+                        const ageRange = story.ageRange || 'All Ages';
+                        
+                        return filter === category || filter === ageRange ||
+                            (filter === 'Ages 2-4' && ageRange.includes('2-4')) ||
+                            (filter === 'Ages 5-7' && ageRange.includes('5-7')) ||
+                            (filter === 'Ages 8+' && ageRange.includes('8+')) ||
+                            (filter === 'Fantasy' && category.includes('Fantasy')) ||
+                            (filter === 'Animals' && category.includes('Animals'));
+                    });
+                }
                 
-                // 如果只有一页，隐藏分页
-                if (totalPages <= 1) {
-                    pagination.style.display = 'none';
+                // Reset to first page and update display
+                currentPage = 1;
+                updatePagination();
+                displayStories();
+            }
+            
+            // Function to display stories for the current page
+            function displayStories() {
+                const storyGrid = document.getElementById('storyList');
+                storyGrid.innerHTML = '';
+                
+                if (filteredStories.length === 0) {
+                    const noResults = document.createElement('div');
+                    noResults.className = 'error-message';
+                    noResults.textContent = 'No stories found matching your criteria.';
+                    storyGrid.appendChild(noResults);
                     return;
                 }
                 
-                // 显示分页
-                pagination.style.display = 'flex';
-                pagination.innerHTML = '';
+                // Calculate start and end indices for current page
+                const startIndex = (currentPage - 1) * storiesPerPage;
+                const endIndex = Math.min(startIndex + storiesPerPage, filteredStories.length);
                 
-                // 添加"上一页"按钮
-                const prevButton = document.createElement('button');
-                prevButton.className = 'pagination-button';
+                // Get stories for current page
+                const currentStories = filteredStories.slice(startIndex, endIndex);
+                
+                // Create and append story cards
+                currentStories.forEach(story => {
+                    const storyCard = createStoryCard(story);
+                    storyGrid.appendChild(storyCard);
+                });
+            }
+            
+            // Function to update pagination
+            function updatePagination() {
+                const paginationContainer = document.getElementById('pagination');
+                
+                // Calculate total pages
+                totalPages = Math.ceil(filteredStories.length / storiesPerPage);
+                
+                // Clear pagination container
+                paginationContainer.innerHTML = '';
+                
+                // Only show pagination if there's more than one page
+                if (totalPages <= 1) {
+                    paginationContainer.style.display = 'none';
+                    return;
+                }
+                
+                paginationContainer.style.display = 'flex';
+                
+                // Add previous button
+                const prevButton = document.createElement('div');
+                prevButton.className = `page-item ${currentPage === 1 ? 'disabled' : ''}`;
                 prevButton.innerHTML = '<i class="fas fa-chevron-left"></i>';
-                prevButton.disabled = currentPage === 1;
-                prevButton.onclick = function() {
-                    if (currentPage > 1) {
-                        displayStories(currentPage - 1);
-                    }
-                };
-                pagination.appendChild(prevButton);
                 
-                // 添加页码按钮
-                const maxVisiblePages = 5; // 最多显示的页码数
-                let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
-                let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
-                
-                // 调整startPage，确保显示maxVisiblePages个页码
-                if (endPage - startPage + 1 < maxVisiblePages && startPage > 1) {
-                    startPage = Math.max(1, endPage - maxVisiblePages + 1);
+                if (currentPage > 1) {
+                    prevButton.addEventListener('click', function() {
+                        currentPage--;
+                        updatePagination();
+                        displayStories();
+                        // Scroll to top of story grid
+                        document.getElementById('storyList').scrollIntoView({ behavior: 'smooth' });
+                    });
                 }
                 
-                // 添加第一页按钮（如果不在可见范围内）
-                if (startPage > 1) {
-                    const firstPageButton = document.createElement('button');
-                    firstPageButton.className = 'pagination-button';
-                    firstPageButton.textContent = '1';
-                    firstPageButton.onclick = function() {
-                        displayStories(1);
-                    };
-                    pagination.appendChild(firstPageButton);
-                    
-                    // 添加省略号（如果需要）
-                    if (startPage > 2) {
-                        const ellipsis = document.createElement('span');
-                        ellipsis.className = 'pagination-ellipsis';
-                        ellipsis.textContent = '...';
-                        pagination.appendChild(ellipsis);
-                    }
+                paginationContainer.appendChild(prevButton);
+                
+                // Determine which page numbers to show
+                let startPage = Math.max(1, currentPage - 2);
+                let endPage = Math.min(totalPages, startPage + 4);
+                
+                // Adjust if we're near the end
+                if (endPage - startPage < 4) {
+                    startPage = Math.max(1, endPage - 4);
                 }
                 
-                // 添加可见页码按钮
+                // Add page numbers
                 for (let i = startPage; i <= endPage; i++) {
-                    const pageButton = document.createElement('button');
-                    pageButton.className = 'pagination-button';
-                    if (i === currentPage) {
-                        pageButton.classList.add('active');
-                    }
+                    const pageButton = document.createElement('div');
+                    pageButton.className = `page-item ${i === currentPage ? 'active' : ''}`;
                     pageButton.textContent = i;
-                    pageButton.onclick = function() {
-                        displayStories(i);
-                    };
-                    pagination.appendChild(pageButton);
-                }
-                
-                // 添加最后一页按钮（如果不在可见范围内）
-                if (endPage < totalPages) {
-                    // 添加省略号（如果需要）
-                    if (endPage < totalPages - 1) {
-                        const ellipsis = document.createElement('span');
-                        ellipsis.className = 'pagination-ellipsis';
-                        ellipsis.textContent = '...';
-                        pagination.appendChild(ellipsis);
+                    
+                    if (i !== currentPage) {
+                        pageButton.addEventListener('click', function() {
+                            currentPage = i;
+                            updatePagination();
+                            displayStories();
+                            // Scroll to top of story grid
+                            document.getElementById('storyList').scrollIntoView({ behavior: 'smooth' });
+                        });
                     }
                     
-                    const lastPageButton = document.createElement('button');
-                    lastPageButton.className = 'pagination-button';
-                    lastPageButton.textContent = totalPages;
-                    lastPageButton.onclick = function() {
-                        displayStories(totalPages);
-                    };
-                    pagination.appendChild(lastPageButton);
+                    paginationContainer.appendChild(pageButton);
                 }
                 
-                // 添加"下一页"按钮
-                const nextButton = document.createElement('button');
-                nextButton.className = 'pagination-button';
+                // Add next button
+                const nextButton = document.createElement('div');
+                nextButton.className = `page-item ${currentPage === totalPages ? 'disabled' : ''}`;
                 nextButton.innerHTML = '<i class="fas fa-chevron-right"></i>';
-                nextButton.disabled = currentPage === totalPages;
-                nextButton.onclick = function() {
-                    if (currentPage < totalPages) {
-                        displayStories(currentPage + 1);
-                    }
-                };
-                pagination.appendChild(nextButton);
+                
+                if (currentPage < totalPages) {
+                    nextButton.addEventListener('click', function() {
+                        currentPage++;
+                        updatePagination();
+                        displayStories();
+                        // Scroll to top of story grid
+                        document.getElementById('storyList').scrollIntoView({ behavior: 'smooth' });
+                    });
+                }
+                
+                paginationContainer.appendChild(nextButton);
             }
         });
     </script>
