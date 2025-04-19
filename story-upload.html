@@ -271,6 +271,17 @@
             opacity: 1;
         }
         
+        .cover-preview {
+            width: 100%;
+            height: 150px;
+            border-radius: 10px;
+            margin-top: 10px;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            border: 1px solid #e0e0e0;
+        }
+        
         @media (max-width: 768px) {
             .container {
                 width: 95%;
@@ -327,11 +338,13 @@
     
     <div class="container">
         <div class="page-title">
-            <h1>Upload Your Story</h1>
-            <p>Share your magical bedtime stories with the world</p>
+            <h1 id="page-heading">Upload Your Story</h1>
+            <p id="page-subheading">Share your magical bedtime stories with the world</p>
         </div>
         
         <form id="uploadForm" class="upload-form">
+            <input type="hidden" id="storyId" name="storyId">
+            
             <div class="form-group">
                 <label for="storyTitle">Story Title</label>
                 <input type="text" id="storyTitle" name="title" class="form-control" placeholder="Enter a captivating title" required>
@@ -366,6 +379,7 @@
             
             <div class="form-group">
                 <label>Cover Image</label>
+                <div id="coverPreview" class="cover-preview" style="display: none;"></div>
                 <div class="cover-options">
                     <div class="cover-option">
                         <div class="file-input-container">
@@ -386,7 +400,7 @@
             </div>
             
             <div class="submit-container">
-                <button type="submit" class="btn-submit">
+                <button type="submit" class="btn-submit" id="submitButton">
                     <i class="fas fa-paper-plane"></i> Submit Story
                 </button>
             </div>
@@ -401,17 +415,112 @@
     
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Get URL parameters
+            const urlParams = new URLSearchParams(window.location.search);
+            const storyId = urlParams.get('id');
+            let isEditMode = false;
+            let originalCoverData = null;
+            
             // File input handling
             const fileInput = document.getElementById('coverFile');
             const fileNameDisplay = document.getElementById('fileName');
+            const coverUrlInput = document.getElementById('coverUrl');
+            const coverPreview = document.getElementById('coverPreview');
             
             fileInput.addEventListener('change', function() {
                 if (this.files && this.files[0]) {
                     fileNameDisplay.textContent = this.files[0].name;
+                    
+                    // Preview the selected image
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        coverPreview.style.backgroundImage = `url(${e.target.result})`;
+                        coverPreview.style.display = 'block';
+                        coverUrlInput.value = ''; // Clear URL input when file is selected
+                    };
+                    reader.readAsDataURL(this.files[0]);
                 } else {
                     fileNameDisplay.textContent = 'No file chosen';
+                    if (!coverUrlInput.value) {
+                        coverPreview.style.display = 'none';
+                    }
                 }
             });
+            
+            // URL input handling
+            coverUrlInput.addEventListener('input', function() {
+                if (this.value) {
+                    coverPreview.style.backgroundImage = `url(${this.value})`;
+                    coverPreview.style.display = 'block';
+                    fileInput.value = ''; // Clear file input when URL is entered
+                    fileNameDisplay.textContent = 'No file chosen';
+                } else if (!fileInput.files[0]) {
+                    coverPreview.style.display = 'none';
+                }
+            });
+            
+            // Check if we're in edit mode
+            if (storyId) {
+                isEditMode = true;
+                
+                // Update page title for edit mode
+                document.getElementById('page-heading').innerHTML = '<i class="fas fa-edit"></i> Edit Story';
+                document.getElementById('page-subheading').textContent = 'Update your magical bedtime story';
+                document.getElementById('submitButton').innerHTML = '<i class="fas fa-save"></i> Save Changes';
+                
+                // Get story data from localStorage
+                const userStories = JSON.parse(localStorage.getItem('userStories')) || [];
+                const storyToEdit = userStories.find(story => story.id === storyId);
+                
+                if (storyToEdit) {
+                    // Populate form with story data
+                    document.getElementById('storyId').value = storyId;
+                    document.getElementById('storyTitle').value = storyToEdit.title;
+                    document.getElementById('storyContent').value = storyToEdit.content;
+                    
+                    // Set select options
+                    const ageRangeSelect = document.getElementById('ageRange');
+                    const categorySelect = document.getElementById('category');
+                    
+                    // Remove the "selected" attribute from default options
+                    Array.from(ageRangeSelect.options).forEach(option => {
+                        option.removeAttribute('selected');
+                        if (option.value === storyToEdit.ageRange) {
+                            option.selected = true;
+                        }
+                    });
+                    
+                    Array.from(categorySelect.options).forEach(option => {
+                        option.removeAttribute('selected');
+                        if (option.value === storyToEdit.category) {
+                            option.selected = true;
+                        }
+                    });
+                    
+                    // Handle cover image
+                    if (storyToEdit.cover) {
+                        originalCoverData = storyToEdit.cover;
+                        
+                        // Check if it's a URL or data URL
+                        if (storyToEdit.cover.startsWith('data:')) {
+                            // It's a data URL (uploaded file)
+                            coverPreview.style.backgroundImage = `url(${storyToEdit.cover})`;
+                            coverPreview.style.display = 'block';
+                        } else {
+                            // It's a regular URL
+                            coverUrlInput.value = storyToEdit.cover;
+                            coverPreview.style.backgroundImage = `url(${storyToEdit.cover})`;
+                            coverPreview.style.display = 'block';
+                        }
+                    }
+                } else {
+                    // Story not found
+                    showAlert('Story not found!');
+                    setTimeout(() => {
+                        window.location.href = 'my-stories.html';
+                    }, 2000);
+                }
+            }
             
             // Form submission
             const uploadForm = document.getElementById('uploadForm');
@@ -433,7 +542,7 @@
                     return;
                 }
                 
-                if (!coverFile && !coverUrl) {
+                if (!coverFile && !coverUrl && !originalCoverData) {
                     showAlert('Please provide a cover image or URL');
                     return;
                 }
@@ -444,17 +553,28 @@
                     
                     reader.onload = function(e) {
                         const coverData = e.target.result;
-                        saveStory(title, content, ageRange, category, coverData);
+                        if (isEditMode) {
+                            updateStory(title, content, ageRange, category, coverData);
+                        } else {
+                            saveNewStory(title, content, ageRange, category, coverData);
+                        }
                     };
                     
                     reader.readAsDataURL(coverFile);
-                } else {
-                    saveStory(title, content, ageRange, category, coverUrl);
+                } else if (coverUrl) {
+                    if (isEditMode) {
+                        updateStory(title, content, ageRange, category, coverUrl);
+                    } else {
+                        saveNewStory(title, content, ageRange, category, coverUrl);
+                    }
+                } else if (originalCoverData) {
+                    // Keep the original cover in edit mode
+                    updateStory(title, content, ageRange, category, originalCoverData);
                 }
             });
             
-            // Function to save story to localStorage
-            function saveStory(title, content, ageRange, category, cover) {
+            // Function to save new story to localStorage
+            function saveNewStory(title, content, ageRange, category, cover) {
                 // Get existing stories or initialize empty array
                 const userStories = JSON.parse(localStorage.getItem('userStories')) || [];
                 
@@ -483,6 +603,39 @@
                 setTimeout(function() {
                     window.location.href = 'my-stories.html';
                 }, 1500);
+            }
+            
+            // Function to update existing story
+            function updateStory(title, content, ageRange, category, cover) {
+                // Get existing stories
+                const userStories = JSON.parse(localStorage.getItem('userStories')) || [];
+                const storyId = document.getElementById('storyId').value;
+                
+                // Find the story to update
+                const storyIndex = userStories.findIndex(story => story.id === storyId);
+                
+                if (storyIndex !== -1) {
+                    // Update story properties
+                    userStories[storyIndex].title = title;
+                    userStories[storyIndex].content = content;
+                    userStories[storyIndex].ageRange = ageRange;
+                    userStories[storyIndex].category = category;
+                    userStories[storyIndex].cover = cover;
+                    userStories[storyIndex].updatedAt = new Date().toISOString();
+                    
+                    // Save updated array to localStorage
+                    localStorage.setItem('userStories', JSON.stringify(userStories));
+                    
+                    // Show success message
+                    showAlert('Story updated successfully!');
+                    
+                    // Redirect to my-stories page after a short delay
+                    setTimeout(function() {
+                        window.location.href = 'my-stories.html';
+                    }, 1500);
+                } else {
+                    showAlert('Error: Story not found!');
+                }
             }
             
             // Function to generate a unique ID

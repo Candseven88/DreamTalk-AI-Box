@@ -378,6 +378,48 @@
             margin-top: auto;
         }
         
+        /* 新增样式 - 示例语音按钮容器 */
+        .sample-voice-container {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        /* 新增样式 - 示例语音按钮 */
+        .btn-sample {
+            background-color: #a1d2ce;
+            color: white;
+            padding: 12px 25px;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(161, 210, 206, 0.3);
+            border: none;
+        }
+        
+        .btn-sample:hover {
+            background-color: #8bc4bf;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(161, 210, 206, 0.4);
+        }
+        
+        .btn-sample i {
+            margin-right: 8px;
+        }
+        
+        /* 示例语音播放状态指示器 */
+        .sample-playing {
+            display: none;
+            font-size: 0.9rem;
+            color: #9d7e9f;
+            margin-top: 10px;
+            font-style: italic;
+        }
+        
         @media (max-width: 768px) {
             .record-container {
                 padding: 30px 20px;
@@ -429,6 +471,14 @@
             </a>
             <div style="width: 100px;"></div> <!-- Spacer for alignment -->
         </header>
+        
+        <!-- 新增示例语音按钮容器 -->
+        <div class="sample-voice-container">
+            <button id="try-sample-voice" class="btn-sample">
+                <i class="fas fa-headphones"></i> Try Sample Voice
+            </button>
+            <div id="sample-playing" class="sample-playing">Playing sample voice...</div>
+        </div>
         
         <div class="record-container">
             <h1 class="section-title">Record Your Voice</h1>
@@ -529,6 +579,10 @@
             const statusDisplay = document.getElementById('status');
             const recordVisualization = document.querySelector('.record-visualization');
             
+            // 新增示例语音按钮元素
+            const trySampleVoiceBtn = document.getElementById('try-sample-voice');
+            const samplePlayingIndicator = document.getElementById('sample-playing');
+            
             let timer;
             let seconds = 0;
             let isRecording = false;
@@ -536,6 +590,38 @@
             let audioChunks = [];
             let audioBlob;
             let audioUrl;
+            let sampleAudio; // 新增示例语音音频对象
+            
+            // 新增示例语音播放功能
+            trySampleVoiceBtn.addEventListener('click', function() {
+                // 创建音频对象（如果尚未创建）
+                if (!sampleAudio) {
+                    sampleAudio = new Audio('sample-voice.mp3');
+                    
+                    // 音频播放结束事件
+                    sampleAudio.onended = function() {
+                        samplePlayingIndicator.style.display = 'none';
+                        trySampleVoiceBtn.innerHTML = '<i class="fas fa-headphones"></i> Try Sample Voice';
+                    };
+                }
+                
+                // 如果音频正在播放，则暂停
+                if (!sampleAudio.paused) {
+                    sampleAudio.pause();
+                    sampleAudio.currentTime = 0;
+                    samplePlayingIndicator.style.display = 'none';
+                    trySampleVoiceBtn.innerHTML = '<i class="fas fa-headphones"></i> Try Sample Voice';
+                } else {
+                    // 否则播放音频
+                    sampleAudio.play().catch(error => {
+                        console.error('Error playing sample voice:', error);
+                        alert('Failed to play sample voice. Please make sure the file exists.');
+                    });
+                    
+                    samplePlayingIndicator.style.display = 'block';
+                    trySampleVoiceBtn.innerHTML = '<i class="fas fa-pause"></i> Stop Sample';
+                }
+            });
             
             function updateTimer() {
                 seconds++;
