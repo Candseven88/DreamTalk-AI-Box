@@ -605,6 +605,9 @@
     
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // 首先加载系统故事
+            loadSystemStories();
+            
             // Filter options functionality
             const filterOptions = document.querySelectorAll('.filter-option');
             
@@ -709,10 +712,12 @@
                 imageContainer.className = 'story-image';
                 
                 const image = document.createElement('img');
-                image.src = story.cover || 'https://images.unsplash.com/photo-1527409335569-f0e5c91fa707?ixlib=rb-1.2.1&auto=format&fit=crop&w=1050&q=80';
+                // 修复封面图片加载逻辑
+                image.src = story.cover || 'covers/default.jpg';
                 image.alt = story.title;
+                // 如果图片加载失败，使用默认图片
                 image.onerror = function() {
-                    this.src = 'https://images.unsplash.com/photo-1527409335569-f0e5c91fa707?ixlib=rb-1.2.1&auto=format&fit=crop&w=1050&q=80';
+                    this.src = 'covers/default.jpg';
                 };
                 
                 imageContainer.appendChild(image);
@@ -733,15 +738,26 @@
                 meta.className = 'story-meta';
                 
                 const ageSpan = document.createElement('span');
-                ageSpan.textContent = isUserStory ? 'Custom Story' : 'Ages 3-7';
+                ageSpan.textContent = story.ageRange || (isUserStory ? 'Custom Story' : 'Ages 3-7');
                 meta.appendChild(ageSpan);
                 
                 const category = document.createElement('div');
                 category.className = 'story-category';
-                category.textContent = isUserStory ? 'Personal' : 'Bedtime';
+                category.textContent = story.category || (isUserStory ? 'Personal' : 'Bedtime');
                 meta.appendChild(category);
                 
                 contentContainer.appendChild(meta);
+                
+                // 添加简要内容预览
+                if (story.content) {
+                    const preview = document.createElement('p');
+                    preview.className = 'story-preview';
+                    preview.textContent = story.content.substring(0, 80) + '...';
+                    preview.style.fontSize = '0.9rem';
+                    preview.style.color = '#9d7e9f';
+                    preview.style.marginBottom = '15px';
+                    contentContainer.appendChild(preview);
+                }
                 
                 // Add actions
                 const actions = document.createElement('div');
