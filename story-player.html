@@ -428,41 +428,20 @@
                 return;
             }
             
-            // 检查是否为用户上传的故事 (以 "story_" 开头的ID格式)
+            // 首先检查是否为用户上传的故事 (通常以 "story_" 开头)
             if (storyId.startsWith('story_')) {
-                // 从localStorage加载用户故事
+                // 从 localStorage 中读取用户故事
                 const userStories = JSON.parse(localStorage.getItem('userStories')) || [];
                 const userStory = userStories.find(story => story.id === storyId);
                 
                 if (userStory) {
-                    // 成功找到用户故事，加载内容
-                    document.getElementById('story-title').textContent = userStory.title;
-                    document.getElementById('story-content').textContent = userStory.content;
-                    
-                    // 如果有封面图片，设置封面
-                    if (userStory.cover) {
-                        document.getElementById('story-cover').src = userStory.cover;
-                        document.getElementById('story-cover').style.display = 'block';
-                    } else {
-                        document.getElementById('story-cover').style.display = 'none';
-                    }
-                    
-                    // 设置其他相关信息
-                    document.getElementById('story-category').textContent = userStory.category || 'Custom Story';
-                    document.getElementById('story-age').textContent = userStory.ageRange || 'All Ages';
-                    
-                    // 更新页面标题
-                    document.title = `${userStory.title} - DreamTalk Box`;
-                    
-                    // 显示故事内容区域
-                    document.getElementById('story-container').style.display = 'block';
-                    document.getElementById('loading-indicator').style.display = 'none';
+                    // 找到用户故事，加载内容
+                    displayStory(userStory);
                 } else {
-                    // 未找到用户故事
                     showError("User story not found");
                 }
             } else {
-                // 原有的系统故事加载逻辑保持不变
+                // 尝试从系统故事中加载
                 fetch('stories.json')
                     .then(response => {
                         if (!response.ok) {
@@ -474,30 +453,35 @@
                         const story = stories.find(s => s.id === storyId);
                         
                         if (story) {
-                            document.getElementById('story-title').textContent = story.title;
-                            document.getElementById('story-content').textContent = story.content;
-                            
-                            if (story.coverImage) {
-                                document.getElementById('story-cover').src = story.coverImage;
-                                document.getElementById('story-cover').style.display = 'block';
-                            } else {
-                                document.getElementById('story-cover').style.display = 'none';
-                            }
-                            
-                            document.getElementById('story-category').textContent = story.category;
-                            document.getElementById('story-age').textContent = story.ageRange;
-                            
-                            document.title = `${story.title} - DreamTalk Box`;
-                            
-                            document.getElementById('story-container').style.display = 'block';
-                            document.getElementById('loading-indicator').style.display = 'none';
+                            displayStory(story);
                         } else {
-                            showError("Story not found");
+                            // 如果系统故事中找不到，再次尝试从用户故事中查找
+                            const userStories = JSON.parse(localStorage.getItem('userStories')) || [];
+                            const userStory = userStories.find(s => s.id === storyId);
+                            
+                            if (userStory) {
+                                displayStory(userStory);
+                            } else {
+                                showError("Story not found");
+                            }
                         }
                     })
                     .catch(error => {
                         console.error('Error loading story:', error);
-                        showError("Failed to load story");
+                        
+                        // 如果系统故事加载失败，尝试从用户故事中查找
+                        try {
+                            const userStories = JSON.parse(localStorage.getItem('userStories')) || [];
+                            const userStory = userStories.find(s => s.id === storyId);
+                            
+                            if (userStory) {
+                                displayStory(userStory);
+                            } else {
+                                showError("Failed to load story");
+                            }
+                        } catch (e) {
+                            showError("Failed to load story");
+                        }
                     });
             }
         }
