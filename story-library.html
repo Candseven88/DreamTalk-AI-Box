@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Story Library - DreamTalk Box</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial Rounded MT Bold', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #fcf2f7;
+            color: #5a3d5c;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            flex: 1;
+        }
+        
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            margin-bottom: 30px;
+        }
+        
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #e86ed0;
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+        }
+        
+        .logo i {
+            margin-right: 10px;
+        }
+        
+        .back-button {
+            background-color: transparent;
+            border: none;
+            color: #9d7e9f;
+            font-size: 1.2rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+        
+        .back-button:hover {
+            color: #5a3d5c;
+            transform: translateX(-5px);
+        }
+        
+        .back-button i {
+            margin-right: 8px;
+        }
+        
+        .library-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        
+        .section-title {
+            font-size: 1.8rem;
+            color: #5a3d5c;
+            position: relative;
+        }
+        
+        .section-title::after {
+            content: "";
+            display: block;
+            width: 80px;
+            height: 4px;
+            background-color: #e86ed0;
+            margin-top: 10px;
+            border-radius: 2px;
+        }
+        
+        .library-actions {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .btn {
+            padding: 12px 25px;
+            border-radius: 50px;
+            border: none;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn i {
+            margin-right: 8px;
+        }
+        
+        .btn-primary {
+            background-color: #e86ed0;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #d64bbd;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(232, 110, 208, 0.3);
+        }
+        
+        .btn-secondary {
+            background-color: #a1d2ce;
+            color: #3a6f6a;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #8bc4bf;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(161, 210, 206, 0.3);
+        }
+        
+        .filter-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: white;
+            padding: 15px 25px;
+            border-radius: 50px;
+            margin-bottom: 40px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .filter-options {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .filter-option {
+            padding: 8px 15px;
+            border-radius: 20px;
+            background-color: #f8f8f8;
+            color: #9d7e9f;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .filter-option:hover, .filter-option.active {
+            background-color: #e86ed0;
+            color: white;
+        }
+        
+        .search-box {
+            display: flex;
+            align-items: center;
+            background-color: #f8f8f8;
+            border-radius: 20px;
+            padding: 8px 15px;
+            width: 250px;
+        }
+        
+        .search-box input {
+            border: none;
+            background: transparent;
+            padding: 5px;
+            flex: 1;
+            color: #5a3d5c;
+            font-size: 0.9rem;
+        }
+        
+        .search-box input:focus {
+            outline: none;
+        }
+        
+        .search-box i {
+            color: #9d7e9f;
+            margin-right: 8px;
+        }
+        
+        .story-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 30px;
+            margin-bottom: 50px;
+        }
+        
+        .story-card {
+            background-color: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+        }
+        
+        .story-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .story-image {
+            height: 200px;
+            overflow: hidden;
+        }
+        
+        .story-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+        
+        .story-card:hover .story-image img {
+            transform: scale(1.05);
+        }
+        
+        .story-content {
+            padding: 20px;
+        }
+        
+        .story-title {
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+            color: #5a3d5c;
+        }
+        
+        .story-meta {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            font-size: 0.8rem;
+            color: #9d7e9f;
+        }
+        
+        .story-category {
+            background-color: #fcf2f7;
+            padding: 4px 10px;
+            border-radius: 15px;
+            color: #e86ed0;
+            font-weight: bold;
+        }
+        
+        .story-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 15px;
+        }
+        
+        .story-play {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #e86ed0;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(232, 110, 208, 0.3);
+        }
+        
+        .story-play:hover {
+            background-color: #d64bbd;
+            transform: scale(1.1);
+        }
+        
+        .story-options {
+            color: #9d7e9f;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .story-options:hover {
+            color: #5a3d5c;
+        }
+        
+        .story-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background-color: #a1d2ce;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            box-shadow: 0 3px 10px rgba(161, 210, 206, 0.3);
+        }
+        
+        .story-badge.custom {
+            background-color: #e86ed0;
+            box-shadow: 0 3px 10px rgba(232, 110, 208, 0.3);
+        }
+        
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 30px;
+        }
+        
+        .page-item {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: white;
+            color: #9d7e9f;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        .page-item:hover, .page-item.active {
+            background-color: #e86ed0;
+            color: white;
+            box-shadow: 0 5px 15px rgba(232, 110, 208, 0.3);
+        }
+        
+        .page-item.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .page-item.disabled:hover {
+            background-color: white;
+            color: #9d7e9f;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+            transform: none;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 30px 0;
+            color: #9d7e9f;
+            font-size: 0.9rem;
+            background-color: white;
+            margin-top: auto;
+        }
+        
+        @media (max-width: 768px) {
+            .library-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .filter-bar {
+                flex-direction: column;
+                align-items: flex-start;
+                border-radius: 20px;
+                padding: 20px;
+            }
+            
+            .search-box {
+                width: 100%;
+            }
+            
+            .story-grid {
+                grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <button class="back-button" onclick="location.href='index.html'">
+                <i class="fas fa-arrow-left"></i> Back
+            </button>
+            <a href="index.html" class="logo">
+                <i class="fas fa-moon"></i> DreamTalk Box
+            </a>
+            <div style="width: 100px;"></div> <!-- Spacer for alignment -->
+        </header>
+        
+        <div class="library-header">
+            <h1 class="section-title">Story Library</h1>
+            <div class="library-actions">
+                <a href="story-upload.html" class="btn btn-secondary">
+                    <i class="fas fa-upload"></i> Upload Story
+                </a>
+                <a href="record.html" class="btn btn-primary">
+                    <i class="fas fa-microphone"></i> Record Voice
+                </a>
+            </div>
+        </div>
+        
+        <div class="filter-bar">
+            <div class="filter-options">
+                <div class="filter-option active">All Stories</div>
+                <div class="filter-option">System Stories</div>
+                <div class="filter-option">My Stories</div>
+                <div class="filter-option">Age 0-3</div>
+                <div class="filter-option">Age 4-6</div>
+                <div class="filter-option">Age 7+</div>
+            </div>
+            
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="Search stories...">
+            </div>
+        </div>
+        
+        <div class="story-grid">
+            <div class="story-card" onclick="location.href='story-player.html'">
+                <div class="story-badge">System</div>
+                <div class="story-image">
+                    <img src="https://images.unsplash.com/photo-1527409335569-f0e5c91fa707?ixlib=rb-1.2.1&auto=format&fit=crop&w=1050&q=80" alt="The Sleepy Moon">
+                </div>
+                <div class="story-content">
+                    <h3 class="story-title">The Sleepy Moon</h3>
+                    <div class="story-meta">
+                        <span>Ages 2-5</span>
+                        <div class="story-category">Animals</div>
+                    </div>
+                    <div class="story-actions">
+                        <div class="story-play">
+                            <i class="fas fa-play"></i>
+                        </div>
+                        <div class="story-options">
+                            <i class="fas fa-ellipsis-v"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="story-card" onclick="location.href='story-player.html'">
+                <div class="story-badge">System</div>
+                <div class="story-image">
+                    <img src="https://images.unsplash.com/photo-1568909344668-6f14a07b56a0?ixlib=rb-1.2.1&auto=format&fit=crop&w=1050&q=80" alt="The Magical Forest">
+                </div>
+                <div class="story-content">
+                    <h3 class="story-title">The Magical Forest</h3>
+                    <div class="story-meta">
+                        <span>Ages 3-7</span>
+                        <div class="story-category">Adventure</div>
+                    </div>
+                    <div class="story-actions">
+                        <div class="story-play">
+                            <i class="fas fa-play"></i>
+                        </div>
+                        <div class="story-options">
+                            <i class="fas fa-ellipsis-v"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="story-card" onclick="location.href='story-player.html'">
+                <div class="story-badge">System</div>
+                <div class="story-image">
+                    <img src="https://images.unsplash.com/photo-1566140967404-b8b3932483f5?ixlib=rb-1.2.1&auto=format&fit=crop&w=1050&q=80" alt="The Brave Little Star">
+                </div>
+                <div class="story-content">
+                    <h3 class="story-title">The Brave Little Star</h3>
+                    <div class="story-meta">
+                        <span>Ages 4-8</span>
+                        <div class="story-category">Courage</div>
+                    </div>
+                    <div class="story-actions">
+                        <div class="story-play">
+                            <i class="fas fa-play"></i>
+                        </div>
+                        <div class="story-options">
+                            <i class="fas fa-ellipsis-v"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="story-card" onclick="location.href='story-player.html'">
+                <div class="story-badge custom">My Story</div>
+                <div class="story-image">
+                    <img src="https://images.unsplash.com/photo-1516280440614-37939bbacd81?ixlib=rb-1.2.1&auto=format&fit=crop&w=1050&q=80" alt="The Dancing Cloud">
+                </div>
+                <div class="story-content">
+                    <h3 class="story-title">The Dancing Cloud</h3>
+                    <div class="story-meta">
+                        <span>Ages 3-6</span>
+                        <div class="story-category">Fantasy</div>
+                    </div>
+                    <div class="story-actions">
+                        <div class="story-play">
+                            <i class="fas fa-play"></i>
+                        </div>
+                        <div class="story-options">
+                            <i class="fas fa-ellipsis-v"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="story-card" onclick="location.href='story-player.html'">
+                <div class="story-badge">System</div>
+                <div class="story-image">
+                    <img src="https://images.unsplash.com/photo-1578897366846-358b9e8b5b3c?ixlib=rb-1.2.1&auto=format&fit=crop&w=1050&q=80" alt="The Friendly Dragon">
+                </div>
+                <div class="story-content">
+                    <h3 class="story-title">The Friendly Dragon</h3>
+                    <div class="story-meta">
+                        <span>Ages 5-9</span>
+                        <div class="story-category">Friendship</div>
+                    </div>
+                    <div class="story-actions">
+                        <div class="story-play">
+                            <i class="fas fa-play"></i>
+                        </div>
+                        <div class="story-options">
+                            <i class="fas fa-ellipsis-v"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="story-card" onclick="location.href='story-player.html'">
+                <div class="story-badge custom">My Story</div>
+                <div class="story-image">
+                    <img src="https://images.unsplash.com/photo-1551966775-a4ddc8df052b?ixlib=rb-1.2.1&auto=format&fit=crop&w=1050&q=80" alt="The Singing Frog">
+                </div>
+                <div class="story-content">
+                    <h3 class="story-title">The Singing Frog</h3>
+                    <div class="story-meta">
+                        <span>Ages 6-10</span>
+                        <div class="story-category">Nature</div>
+                    </div>
+                    <div class="story-actions">
+                        <div class="story-play">
+                            <i class="fas fa-play"></i>
+                        </div>
+                        <div class="story-options">
+                            <i class="fas fa-ellipsis-v"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="story-card" onclick="location.href='story-player.html'">
+                <div class="story-badge">System</div>
+                <div class="story-image">
+                    <img src="https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?ixlib=rb-1.2.1&auto=format&fit=crop&w=1050&q=80" alt="The Space Explorer">
+                </div>
+                <div class="story-content">
+                    <h3 class="story-title">The Space Explorer</h3>
+                    <div class="story-meta">
+                        <span>Ages 5-9</span>
+                        <div class="story-category">Adventure</div>
+                    </div>
+                    <div class="story-actions">
+                        <div class="story-play">
+                            <i class="fas fa-play"></i>
+                        </div>
+                        <div class="story-options">
+                            <i class="fas fa-ellipsis-v"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="pagination">
+            <div class="page-item">
+                <i class="fas fa-chevron-left"></i>
+            </div>
+            <div class="page-item active">1</div>
+            <div class="page-item">2</div>
+            <div class="page-item">3</div>
+            <div class="page-item">
+                <i class="fas fa-chevron-right"></i>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        <p>© 2023 DreamTalk Box. All rights reserved.</p>
+    </footer>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Filter options functionality
+            const filterOptions = document.querySelectorAll('.filter-option');
+            
+            filterOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    // Remove active class from all options
+                    filterOptions.forEach(opt => opt.classList.remove('active'));
+                    
+                    // Add active class to clicked option
+                    this.classList.add('active');
+                    
+                    // Filter stories based on the selected option
+                    const filter = this.textContent.trim();
+                    filterStories(filter);
+                });
+            });
+            
+            // Search functionality
+            const searchInput = document.querySelector('.search-box input');
+            
+            searchInput.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+                const storyCards = document.querySelectorAll('.story-card');
+                
+                storyCards.forEach(card => {
+                    const title = card.querySelector('.story-title').textContent.toLowerCase();
+                    
+                    if (title.includes(searchTerm)) {
+                        card.style.display = 'block';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            });
+            
+            // Pagination functionality
+            const pageItems = document.querySelectorAll('.pagination .page-item');
+            
+            pageItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    if (!this.classList.contains('active') && !this.classList.contains('disabled')) {
+                        // Remove active class from all page items
+                        pageItems.forEach(page => page.classList.remove('active'));
+                        
+                        // Add active class to clicked page item
+                        this.classList.add('active');
+                        
+                        // Here you would typically load the stories for the selected page
+                        console.log('Page selected:', this.textContent);
+                    }
+                });
+            });
+            
+            // Load user stories when page loads
+            loadUserStories();
+            
+            // Function to load user stories from localStorage
+            function loadUserStories() {
+                const storyGrid = document.querySelector('.story-grid');
+                const userStories = JSON.parse(localStorage.getItem('userStories')) || [];
+                
+                // If there are user stories, add a section title before them
+                if (userStories.length > 0) {
+                    // Create a section title for user stories if it doesn't exist
+                    if (!document.querySelector('.user-stories-title')) {
+                        const userStoriesTitle = document.createElement('h2');
+                        userStoriesTitle.className = 'section-title user-stories-title';
+                        userStoriesTitle.style.marginTop = '50px';
+                        userStoriesTitle.style.marginBottom = '30px';
+                        userStoriesTitle.innerHTML = 'My Stories <i class="fas fa-pencil-alt" style="font-size: 0.8em; margin-left: 10px;"></i>';
+                        
+                        // Insert the title before the pagination
+                        const pagination = document.querySelector('.pagination');
+                        storyGrid.parentNode.insertBefore(userStoriesTitle, pagination);
+                    }
+                    
+                    // Create story cards for each user story
+                    userStories.forEach(story => {
+                        const storyCard = createStoryCard(story, true);
+                        storyGrid.appendChild(storyCard);
+                    });
+                }
+            }
+            
+            // Function to create a story card element
+            function createStoryCard(story, isUserStory = false) {
+                const storyCard = document.createElement('div');
+                storyCard.className = 'story-card';
+                storyCard.setAttribute('data-id', story.id);
+                storyCard.onclick = function() {
+                    location.href = `story-player.html?id=${story.id}`;
+                };
+                
+                // Create badge
+                const badge = document.createElement('div');
+                badge.className = `story-badge ${isUserStory ? 'custom' : ''}`;
+                badge.textContent = isUserStory ? 'My Story' : 'System';
+                storyCard.appendChild(badge);
+                
+                // Create image container
+                const imageContainer = document.createElement('div');
+                imageContainer.className = 'story-image';
+                
+                const image = document.createElement('img');
+                image.src = story.cover || 'https://images.unsplash.com/photo-1527409335569-f0e5c91fa707?ixlib=rb-1.2.1&auto=format&fit=crop&w=1050&q=80';
+                image.alt = story.title;
+                image.onerror = function() {
+                    this.src = 'https://images.unsplash.com/photo-1527409335569-f0e5c91fa707?ixlib=rb-1.2.1&auto=format&fit=crop&w=1050&q=80';
+                };
+                
+                imageContainer.appendChild(image);
+                storyCard.appendChild(imageContainer);
+                
+                // Create content container
+                const contentContainer = document.createElement('div');
+                contentContainer.className = 'story-content';
+                
+                // Add title
+                const title = document.createElement('h3');
+                title.className = 'story-title';
+                title.textContent = story.title;
+                contentContainer.appendChild(title);
+                
+                // Add meta info
+                const meta = document.createElement('div');
+                meta.className = 'story-meta';
+                
+                const ageSpan = document.createElement('span');
+                ageSpan.textContent = isUserStory ? 'Custom Story' : 'Ages 3-7';
+                meta.appendChild(ageSpan);
+                
+                const category = document.createElement('div');
+                category.className = 'story-category';
+                category.textContent = isUserStory ? 'Personal' : 'Bedtime';
+                meta.appendChild(category);
+                
+                contentContainer.appendChild(meta);
+                
+                // Add actions
+                const actions = document.createElement('div');
+                actions.className = 'story-actions';
+                
+                const playButton = document.createElement('div');
+                playButton.className = 'story-play';
+                playButton.innerHTML = '<i class="fas fa-play"></i>';
+                actions.appendChild(playButton);
+                
+                const options = document.createElement('div');
+                options.className = 'story-options';
+                options.innerHTML = '<i class="fas fa-ellipsis-v"></i>';
+                
+                // Add event listener to stop propagation for options button
+                options.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    // Here you could add a dropdown menu for edit/delete options
+                    if (isUserStory) {
+                        if (confirm('Do you want to delete this story?')) {
+                            deleteUserStory(story.id);
+                        }
+                    }
+                });
+                
+                actions.appendChild(options);
+                contentContainer.appendChild(actions);
+                
+                storyCard.appendChild(contentContainer);
+                
+                return storyCard;
+            }
+            
+            // Function to delete a user story
+            function deleteUserStory(storyId) {
+                let userStories = JSON.parse(localStorage.getItem('userStories')) || [];
+                
+                // Filter out the story to delete
+                userStories = userStories.filter(story => story.id !== storyId);
+                
+                // Save updated stories back to localStorage
+                localStorage.setItem('userStories', JSON.stringify(userStories));
+                
+                // Remove the story card from the DOM
+                const storyCard = document.querySelector(`.story-card[data-id="${storyId}"]`);
+                if (storyCard) {
+                    storyCard.remove();
+                }
+                
+                // If no user stories left, remove the section title
+                if (userStories.length === 0) {
+                    const userStoriesTitle = document.querySelector('.user-stories-title');
+                    if (userStoriesTitle) {
+                        userStoriesTitle.remove();
+                    }
+                }
+            }
+            
+            // Function to filter stories based on selection
+            function filterStories(filter) {
+                const storyCards = document.querySelectorAll('.story-card');
+                
+                storyCards.forEach(card => {
+                    const badge = card.querySelector('.story-badge').textContent;
+                    const ageSpan = card.querySelector('.story-meta span').textContent;
+                    
+                    switch(filter) {
+                        case 'All Stories':
+                            card.style.display = 'block';
+                            break;
+                        case 'System Stories':
+                            card.style.display = badge === 'System' ? 'block' : 'none';
+                            break;
+                        case 'My Stories':
+                            card.style.display = badge === 'My Story' ? 'block' : 'none';
+                            break;
+                        case 'Age 0-3':
+                            card.style.display = ageSpan.includes('0-3') ? 'block' : 'none';
+                            break;
+                        case 'Age 4-6':
+                            card.style.display = ageSpan.includes('4-6') ? 'block' : 'none';
+                            break;
+                        case 'Age 7+':
+                            card.style.display = ageSpan.includes('7') ? 'block' : 'none';
+                            break;
+                        default:
+                            card.style.display = 'block';
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
