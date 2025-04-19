@@ -319,48 +319,11 @@
         
         <section class="story-section">
             <h2 class="section-title">Featured Stories</h2>
-            <div class="story-cards">
-                <div class="story-card" onclick="location.href='story-player.html'">
-                    <div class="story-image">
-                        <img src="https://images.unsplash.com/photo-1527409335569-f0e5c91fa707?ixlib=rb-1.2.1&auto=format&fit=crop&w=1050&q=80" alt="The Sleepy Moon">
-                    </div>
-                    <div class="story-content">
-                        <h3 class="story-title">The Sleepy Moon</h3>
-                        <p class="story-description">A gentle tale about the moon who can't fall asleep and the stars who help him find his dreams.</p>
-                        <div class="story-footer">
-                            <span class="story-age">Ages 2-5</span>
-                            <i class="fas fa-play-circle story-play"></i>
-                        </div>
-                    </div>
-                </div>
+            <div class="story-cards" id="storyList">
+                <!-- 动态加载故事会自动插入 -->
+              </div>
                 
-                <div class="story-card" onclick="location.href='story-player.html'">
-                    <div class="story-image">
-                        <img src="https://images.unsplash.com/photo-1568909344668-6f14a07b56a0?ixlib=rb-1.2.1&auto=format&fit=crop&w=1050&q=80" alt="The Magical Forest">
-                    </div>
-                    <div class="story-content">
-                        <h3 class="story-title">The Magical Forest</h3>
-                        <p class="story-description">Join Lily and her rabbit friend as they discover the secrets of the enchanted forest at night.</p>
-                        <div class="story-footer">
-                            <span class="story-age">Ages 3-7</span>
-                            <i class="fas fa-play-circle story-play"></i>
-                        </div>
-                    </div>
-                </div>
                 
-                <div class="story-card" onclick="location.href='story-player.html'">
-                    <div class="story-image">
-                        <img src="https://images.unsplash.com/photo-1566140967404-b8b3932483f5?ixlib=rb-1.2.1&auto=format&fit=crop&w=1050&q=80" alt="The Brave Little Star">
-                    </div>
-                    <div class="story-content">
-                        <h3 class="story-title">The Brave Little Star</h3>
-                        <p class="story-description">A heartwarming story about a tiny star who learns that even the smallest light can guide someone home.</p>
-                        <div class="story-footer">
-                            <span class="story-age">Ages 4-8</span>
-                            <i class="fas fa-play-circle story-play"></i>
-                        </div>
-                    </div>
-                </div>
             </div>
             
             <div style="text-align: center; margin-top: 30px;">
@@ -540,6 +503,42 @@
                 observer.observe(card);
             });
         });
+        
     </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+          const storyList = document.getElementById('storyList');
+        
+          try {
+            const response = await fetch('stories.json');
+            const stories = await response.json();
+        
+            storyList.innerHTML = ''; // 清空占位内容
+        
+            stories.slice(0, 8).forEach(story => {
+              const card = document.createElement('div');
+              card.className = 'story-card';
+              card.onclick = () => location.href = `story-player.html?id=${story.id}`;
+              card.innerHTML = `
+                <div class="story-image">
+                  <img src="${story.cover}" alt="${story.title}">
+                </div>
+                <div class="story-content">
+                  <h3 class="story-title">${story.title}</h3>
+                  <p class="story-description">${story.content.substring(0, 100)}...</p>
+                  <div class="story-footer">
+                    <span class="story-age">Age 3+</span>
+                    <i class="fas fa-play-circle story-play"></i>
+                  </div>
+                </div>
+              `;
+              storyList.appendChild(card);
+            });
+          } catch (err) {
+            console.error('Failed to load stories:', err);
+            storyList.innerHTML = '<p>Failed to load stories. Please try again later.</p>';
+          }
+        });
+        </script>
 </body>
 </html>
