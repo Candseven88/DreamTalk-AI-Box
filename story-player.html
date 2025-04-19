@@ -420,24 +420,85 @@
          * Extract story ID from URL parameters and load the story
          */
         async function loadStoryFromUrl() {
-            // Get story ID from URL
             const urlParams = new URLSearchParams(window.location.search);
             const storyId = urlParams.get('id');
             
             if (!storyId) {
-                updateStatus('Error: No story ID provided in URL');
+                showError("No story ID provided");
                 return;
             }
             
-            // Determine if it's a system story or user story
-            if (storyId.startsWith('story')) {
-                // Load system story from stories.json
-                await loadSystemStory(storyId);
-            } else if (storyId.startsWith('user_')) {
-                // Load user story from localStorage
-                loadUserStory(storyId);
+            // 检查是否为用户上传的故事 (以 "story_" 开头的ID格式)
+            if (storyId.startsWith('story_')) {
+                // 从localStorage加载用户故事
+                const userStories = JSON.parse(localStorage.getItem('userStories')) || [];
+                const userStory = userStories.find(story => story.id === storyId);
+                
+                if (userStory) {
+                    // 成功找到用户故事，加载内容
+                    document.getElementById('story-title').textContent = userStory.title;
+                    document.getElementById('story-content').textContent = userStory.content;
+                    
+                    // 如果有封面图片，设置封面
+                    if (userStory.cover) {
+                        document.getElementById('story-cover').src = userStory.cover;
+                        document.getElementById('story-cover').style.display = 'block';
+                    } else {
+                        document.getElementById('story-cover').style.display = 'none';
+                    }
+                    
+                    // 设置其他相关信息
+                    document.getElementById('story-category').textContent = userStory.category || 'Custom Story';
+                    document.getElementById('story-age').textContent = userStory.ageRange || 'All Ages';
+                    
+                    // 更新页面标题
+                    document.title = `${userStory.title} - DreamTalk Box`;
+                    
+                    // 显示故事内容区域
+                    document.getElementById('story-container').style.display = 'block';
+                    document.getElementById('loading-indicator').style.display = 'none';
+                } else {
+                    // 未找到用户故事
+                    showError("User story not found");
+                }
             } else {
-                updateStatus('Error: Invalid story ID format');
+                // 原有的系统故事加载逻辑保持不变
+                fetch('stories.json')
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(stories => {
+                        const story = stories.find(s => s.id === storyId);
+                        
+                        if (story) {
+                            document.getElementById('story-title').textContent = story.title;
+                            document.getElementById('story-content').textContent = story.content;
+                            
+                            if (story.coverImage) {
+                                document.getElementById('story-cover').src = story.coverImage;
+                                document.getElementById('story-cover').style.display = 'block';
+                            } else {
+                                document.getElementById('story-cover').style.display = 'none';
+                            }
+                            
+                            document.getElementById('story-category').textContent = story.category;
+                            document.getElementById('story-age').textContent = story.ageRange;
+                            
+                            document.title = `${story.title} - DreamTalk Box`;
+                            
+                            document.getElementById('story-container').style.display = 'block';
+                            document.getElementById('loading-indicator').style.display = 'none';
+                        } else {
+                            showError("Story not found");
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error loading story:', error);
+                        showError("Failed to load story");
+                    });
             }
         }
         
