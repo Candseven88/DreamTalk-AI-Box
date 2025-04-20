@@ -256,7 +256,7 @@
             line-height: 1.5;
         }
         
-        /* 订阅计划样式 */
+        /* Subscription plans styles */
         .subscription-plans {
             padding: 60px 20px;
             background-color: #fcf2f7;
@@ -473,6 +473,87 @@
                 grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
             }
         }
+        
+        /* Login system styles */
+        .auth-button {
+            background-color: #a1d2ce;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 8px 20px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .auth-button:hover {
+            background-color: #8bc4bf;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(161, 210, 206, 0.3);
+        }
+        
+        #user-info {
+            text-align: right;
+        }
+        
+        #user-greeting {
+            display: block;
+            font-size: 0.8rem;
+            color: #5a3d5c;
+            margin-bottom: 5px;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        
+        .modal-content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 400px;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+        
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #9d7e9f;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #5a3d5c;
+        }
+        
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1rem;
+        }
     </style>
     <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-N2QVVC3591"></script>
@@ -487,22 +568,19 @@
 <body>
     <div class="container">
         <header>
-            <!-- 在 header 部分添加用户登录区域 -->
-            <header>
-                <div class="logo">
-                    <i class="fas fa-moon"></i> DreamTalk Box
+            <div class="logo">
+                <i class="fas fa-moon"></i> DreamTalk Box
+            </div>
+            <p class="tagline">Bedtime stories in your voice, creating magical dreams for your little ones</p>
+            
+            <!-- User login area -->
+            <div id="user-auth-container" style="position: absolute; top: 20px; right: 20px;">
+                <button id="login-button" class="auth-button">Login</button>
+                <div id="user-info" style="display: none;">
+                    <span id="user-greeting"></span>
+                    <button id="logout-button" class="auth-button">Logout</button>
                 </div>
-                <p class="tagline">Bedtime stories in your voice, creating magical dreams for your little ones</p>
-                
-                <!-- 添加用户登录区域 -->
-                <div id="user-auth-container" style="position: absolute; top: 20px; right: 20px;">
-                    <button id="login-button" class="auth-button">Login</button>
-                    <div id="user-info" style="display: none;">
-                        <span id="user-greeting"></span>
-                        <button id="logout-button" class="auth-button">Logout</button>
-                    </div>
-                </div>
-            </header>
+            </div>
         </header>
         
         <div class="action-buttons">
@@ -517,10 +595,7 @@
         <section class="story-section">
             <h2 class="section-title">Featured Stories</h2>
             <div class="story-cards" id="storyList">
-                <!-- 动态加载故事会自动插入 -->
-              </div>
-                
-                
+                <!-- Stories will be loaded dynamically -->
             </div>
             
             <div style="text-align: center; margin-top: 30px;">
@@ -559,8 +634,8 @@
             </div>
         </section>
         
-        <!-- 添加订阅计划部分 -->
-        <section class="subscription-plans">
+        <!-- Subscription plans section -->
+        <section class="subscription-plans" id="subscription-section">
             <h2 class="section-title">Subscription Plans</h2>
             <p class="section-description">Choose the perfect plan for your family's bedtime story needs</p>
             
@@ -573,12 +648,12 @@
                     </div>
                     <div class="plan-features">
                         <ul>
-                            <li><i class="fas fa-check"></i> Access to 20+ stories</li>
+                            <li><i class="fas fa-check"></i> Access to 30 stories</li>
+                            <li><i class="fas fa-check"></i> Up to 90 minutes total</li>
                             <li><i class="fas fa-check"></i> Basic voice customization</li>
-                            <li><i class="fas fa-check"></i> 30 minutes of reading time</li>
                         </ul>
                     </div>
-                    <a href="https://www.creem.io/payment/prod_4MFFcp902Sp1aXMWsBSuRG" class="plan-button">
+                    <a href="subscribe-success.html?plan=starter" class="plan-button">
                         Subscribe Now <i class="fas fa-arrow-right"></i>
                     </a>
                 </div>
@@ -592,13 +667,13 @@
                     </div>
                     <div class="plan-features">
                         <ul>
-                            <li><i class="fas fa-check"></i> Access to 50+ stories</li>
+                            <li><i class="fas fa-check"></i> Access to 100 stories</li>
+                            <li><i class="fas fa-check"></i> Up to 300 minutes total</li>
                             <li><i class="fas fa-check"></i> Advanced voice customization</li>
-                            <li><i class="fas fa-check"></i> 2 hours of reading time</li>
                             <li><i class="fas fa-check"></i> Upload 5 custom stories</li>
                         </ul>
                     </div>
-                    <a href="https://www.creem.io/payment/prod_m0Fosk4j2ceapiwZkf5Wg" class="plan-button">
+                    <a href="subscribe-success.html?plan=plus" class="plan-button">
                         Subscribe Now <i class="fas fa-arrow-right"></i>
                     </a>
                 </div>
@@ -611,14 +686,14 @@
                     </div>
                     <div class="plan-features">
                         <ul>
-                            <li><i class="fas fa-check"></i> Access to all stories</li>
+                            <li><i class="fas fa-check"></i> Access to 300 stories</li>
+                            <li><i class="fas fa-check"></i> Up to 900 minutes total</li>
                             <li><i class="fas fa-check"></i> Premium voice customization</li>
-                            <li><i class="fas fa-check"></i> Unlimited reading time</li>
                             <li><i class="fas fa-check"></i> Upload unlimited custom stories</li>
                             <li><i class="fas fa-check"></i> Perfect for educators & creators</li>
                         </ul>
                     </div>
-                    <a href="https://www.creem.io/payment/prod_4Tezu3Ozv3ETbXMolp2dYr" class="plan-button">
+                    <a href="subscribe-success.html?plan=pro" class="plan-button">
                         Subscribe Now <i class="fas fa-arrow-right"></i>
                     </a>
                 </div>
@@ -636,7 +711,36 @@
         </footer>
     </div>
     
+    <!-- Login Modal -->
+    <div id="login-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2 style="text-align: center; margin-bottom: 20px; color: #5a3d5c;">Login to DreamTalk Box</h2>
+            <form id="login-form">
+                <div class="form-group">
+                    <label for="email">Email:</label>
+                    <input type="email" id="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="nickname">Nickname:</label>
+                    <input type="text" id="nickname" required>
+                </div>
+                <div class="form-group">
+                    <label for="subscription">Subscription Plan:</label>
+                    <select id="subscription">
+                        <option value="free">Free</option>
+                        <option value="starter">Starter</option>
+                        <option value="plus">Plus</option>
+                        <option value="pro">Pro</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Login</button>
+            </form>
+        </div>
+    </div>
+    
     <script>
+        // Animation for story cards on scroll
         document.addEventListener('DOMContentLoaded', function() {
             // Animation for story cards on scroll
             const storyCards = document.querySelectorAll('.story-card');
@@ -656,356 +760,472 @@
                 card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
                 observer.observe(card);
             });
+            
+            // Load featured stories
+            loadFeaturedStories();
+            
+            // Setup login system
+            setupLoginSystem();
+            
+            // Initialize anonymous user
+            initAnonymousUser();
+            
+            // Check and reset monthly play count
+            checkAndResetMonthlyPlayCount();
+            
+            // Update user interface
+            updateUserInterface();
         });
         
-    </script>
-    <script>
-        document.addEventListener('DOMContentLoaded', async () => {
+        // Load featured stories from JSON file
+        async function loadFeaturedStories() {
             const storyList = document.getElementById('storyList');
             
+            // Show loading indicator
+            storyList.innerHTML = '<div style="text-align: center; width: 100%;"><i class="fas fa-spinner fa-spin" style="font-size: 2rem; color: #e86ed0; margin: 30px 0;"></i><p>Loading stories...</p></div>';
+            
             try {
-                // 1. 加载系统故事
-                const response = await fetch('stories.json');
-                const systemStories = await response.json();
+                // Make sure we have the correct path
+                const storyPath = '/stories.json';
+                console.log('Attempting to fetch stories from:', storyPath);
                 
-                // 2. 加载用户故事
+                // Attempt to load stories from stories.json with timeout
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+                
+                const response = await fetch(storyPath, { 
+                    signal: controller.signal,
+                    headers: { 'Cache-Control': 'no-cache' } 
+                });
+                
+                clearTimeout(timeoutId);
+                
+                if (!response.ok) {
+                    console.warn(`Response not ok: ${response.status}`);
+                    throw new Error(`Failed to fetch stories: ${response.status}`);
+                }
+                
+                const systemStories = await response.json();
+                console.log('Successfully loaded', systemStories.length, 'system stories');
+                
+                // Load user stories from localStorage
                 let userStories = [];
                 try {
                     const userStoriesData = localStorage.getItem('userStories');
                     if (userStoriesData) {
                         userStories = JSON.parse(userStoriesData);
+                        console.log('Loaded', userStories.length, 'user stories from localStorage');
                     }
                 } catch (error) {
                     console.warn('Failed to load user stories:', error);
-                    // 如果解析失败，继续使用空数组
                 }
                 
-                // 3. 合并故事并限制数量为8个
-                // 系统故事优先，然后是用户故事
+                // Combine and limit to 8 stories
                 const allStories = [...systemStories, ...userStories].slice(0, 8);
                 
-                // 清空占位内容
+                // Clear loading placeholder
                 storyList.innerHTML = '';
                 
-                // 4. 渲染故事卡片
-                allStories.forEach(story => {
-                    const card = document.createElement('div');
-                    card.className = 'story-card';
-                    
-                    // 设置点击事件
-                    card.onclick = () => location.href = `story-player.html?id=${story.id}`;
-                    
-                    // 处理封面图片 - 系统故事可能使用 cover 或 coverImage
-                    const coverImage = story.cover || story.coverImage || 'covers/default.jpg';
-                    
-                    // 处理故事内容 - 确保有内容且截取前100个字符
-                    const content = story.content ? story.content.substring(0, 100) + '...' : 'No description available...';
-                    
-                    // 处理年龄范围
-                    const ageRange = story.ageRange || 'Age 3+';
-                    
-                    // 构建卡片HTML
-                    card.innerHTML = `
-                        <div class="story-image">
-                            <img src="${coverImage}" alt="${story.title}" onerror="this.src='covers/default.jpg'">
-                        </div>
-                        <div class="story-content">
-                            <h3 class="story-title">${story.title}</h3>
-                            <p class="story-description">${content}</p>
-                            <div class="story-footer">
-                                <span class="story-age">${ageRange}</span>
-                                <i class="fas fa-play-circle story-play"></i>
-                            </div>
-                        </div>
-                    `;
-                    
-                    storyList.appendChild(card);
-                });
-                
-                // 如果没有故事可显示
-                if (allStories.length === 0) {
+                // Display stories
+                if (allStories.length > 0) {
+                    allStories.forEach(story => {
+                        const card = createStoryCard(story);
+                        storyList.appendChild(card);
+                    });
+                    console.log('Displayed', allStories.length, 'stories');
+                } else {
                     storyList.innerHTML = '<p style="text-align: center; width: 100%;">No stories available. Try adding your own!</p>';
+                    console.warn('No stories available to display');
+                }
+            } catch (error) {
+                console.error('Error loading stories:', error);
+                
+                // Clear loading indicator
+                storyList.innerHTML = '';
+                
+                // Try loading sample stories as fallback
+                const sampleStories = getSampleStories();
+                console.log('Using sample stories as fallback');
+                
+                if (sampleStories.length > 0) {
+                    sampleStories.forEach(story => {
+                        const card = createStoryCard(story);
+                        storyList.appendChild(card);
+                    });
+                } else {
+                    // If all else fails, show error
+                    storyList.innerHTML = '<p style="text-align: center; width: 100%;">Failed to load stories. Please try again later.</p>';
                 }
                 
-            } catch (err) {
-                console.error('Failed to load stories:', err);
-                storyList.innerHTML = '<p style="text-align: center; width: 100%;">Failed to load stories. Please try again later.</p>';
+                // Also try to show user stories if available
+                try {
+                    const userStories = JSON.parse(localStorage.getItem('userStories') || '[]');
+                    if (userStories.length > 0) {
+                        // If we're showing sample stories, clear them first
+                        if (sampleStories.length > 0) {
+                            storyList.innerHTML = '';
+                        }
+                        
+                        // Display user stories
+                        userStories.slice(0, 4).forEach(story => {
+                            const card = createStoryCard(story);
+                            storyList.appendChild(card);
+                        });
+                        console.log('Displayed', userStories.length, 'user stories as fallback');
+                    }
+                } catch (fallbackError) {
+                    console.error('Fallback error:', fallbackError);
+                }
             }
-        });
-        </script>
-        // 在文件末尾的 </body> 标签前添加以下脚本
-        <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                // 更新订阅计划描述
-                updateSubscriptionPlansDescription();
-                
-                // 添加订阅模拟面板按钮（仅开发环境使用）
-                addSubscriptionSimulationPanel();
+        }
+        
+        // Get sample stories as fallback
+        function getSampleStories() {
+            return [
+            {
+    "id": "story1",
+    "title": "Bunty the Brave Bunny",
+    "content": "Bunty was a small bunny with extra-long ears who lived in a cozy burrow under an old oak tree. While other bunnies hopped only in daylight, Bunty dreamed of nighttime adventures. One evening, when the moon was full, he ventured into the meadow alone. Suddenly, he heard a tiny cry! Following the sound, Bunty discovered a baby bird who had fallen from its nest. Though his heart thumped with fear, Bunty gently carried the bird in his long ears, hopping higher and higher up the tree until he reached the nest. The mother bird sang a beautiful thank-you song, and from that night on, Bunty knew that being brave wasn't about being fearless—it was about helping others even when you're scared.",
+    "cover": "/covers/story1.jpg"
+  },
+  {
+    "id": "story2",
+    "title": "Where is My Star?",
+    "content": "Every night, little Emma watched a special twinkling star from her bedroom window. \"That's my star,\" she would whisper before falling asleep. One cloudy evening, Emma couldn't find her star in the sky. \"Where is my star?\" she wondered sadly. That night, Emma dreamed she floated up into the clouds where she met her star, who was playing hide-and-seek. \"Sometimes I'm hidden,\" the star explained, \"but I'm always here.\" The star gave Emma a tiny spark to keep in a jar beside her bed. When Emma woke, she found a beautiful glowing jar on her nightstand. Now, even on cloudy nights, Emma smiles at her jar, knowing her star is always watching over her, whether she can see it or not.",
+    "cover": "/covers/story2.jpg"
+  },
+  {
+    "id": "story3",
+    "title": "The Whispering Tree",
+    "content": "In the center of Willow Park stood an ancient oak tree that children said could whisper secrets. Lily didn't believe the stories until one autumn day when she sat beneath its branches, feeling lonely on her first day in a new town. \"I wish I had a friend,\" she sighed. Suddenly, a gentle breeze rustled the leaves, and Lily heard a soft whisper: \"Look up.\" In the branches above sat a boy named Sam, who was building a tree house. \"Would you like to help?\" he asked. As they worked together, the tree seemed to guide them, dropping perfect branches just where they needed them. By sunset, they had a beautiful tree house and a new friendship. From that day on, Lily understood that the tree didn't just whisper—it brought people together.",
+    "cover": "/covers/story3.jpg"
+  },
+  {
+    "id": "story4",
+    "title": "Luna and the Night Cloud",
+    "content": "Luna was a little girl who couldn't fall asleep when the night was too bright. One full moon evening, she noticed a fluffy cloud floating outside her window. \"Excuse me,\" Luna whispered, \"could you please cover the moon? It's too bright for sleeping.\" To her surprise, the cloud drifted over and dimmed the moonlight. \"I'm Nimbus, the Night Cloud,\" it whispered back. \"I help creatures sleep all over the world.\" Luna climbed onto her windowsill and hopped onto Nimbus. Together they floated above sleeping towns, where Nimbus showed Luna how he shaded owls' nests and raccoons' hideaways. When they returned to Luna's window, she was finally sleepy. From then on, whenever Luna had trouble sleeping, Nimbus would visit, bringing gentle darkness and sweet dreams.",
+    "cover": "/covers/story4.jpg"
+  },
+  {
+    "id": "story5",
+    "title": "Nina's Magic Pillow",
+    "content": "Nina received a special pillow from her grandmother on her fifth birthday. \"This pillow is magic,\" Grandma whispered. \"It can take you anywhere in your dreams.\" That night, Nina hugged her new pillow tight and wished to visit the ocean. As she drifted to sleep, she felt gentle waves rocking her and opened her eyes to find herself floating on her pillow in a turquoise sea! Dolphins leaped around her, a friendly octopus waved its tentacles, and colorful fish played hide-and-seek in coral reefs. When morning came, Nina found a tiny seashell tangled in her hair. Each night, Nina's pillow carried her to new adventures—jungle treetops, snowy mountains, even the moon—always bringing back a small treasure to remind her that the magic of dreams is real.",
+    "cover": "/covers/story5.jpg"
+  },
+  {
+    "id": "story6",
+    "title": "Toto and the Forest Song",
+    "content": "Toto was a small fox with unusually large ears who lived at the edge of the Whispering Forest. While other foxes used their ears for hunting, Toto used his to listen to the forest's music—the rustling leaves, chirping crickets, and babbling brooks. One day, Toto noticed the forest had fallen silent. Following the last echo of sound, he discovered a fallen tree blocking the river, making the waterfall stop. The animals couldn't figure out how to move it, but Toto had an idea. He taught the birds, frogs, and crickets to sing together in a special rhythm that made the fish swim in unison, pushing the log until it rolled away. The waterfall flowed again, and the forest burst into the most beautiful melody Toto had ever heard—a thank-you song just for him.",
+    "cover": "/covers/story6.jpg"
+  },
+  {
+    "id": "story7",
+    "title": "The Sleepy Sunflower",
+    "content": "In Farmer Miller's garden grew a sunflower named Sunny who had a peculiar problem—she couldn't stay awake during the day! While other sunflowers turned their faces to follow the sun, Sunny's head drooped as she snoozed from sunrise to sunset. The other flowers teased her: \"What kind of sunflower sleeps when the sun shines?\" Sunny felt very sad. One night, as she stood wide awake under the stars, she noticed a family of field mice shivering in the cold. Sunny bent her tall stem and wrapped her large leaves around them like a blanket. Soon, other nighttime creatures—moths, owls, and bats—came to Sunny for warmth and company. By morning, everyone agreed: Sunny wasn't a sleepy sunflower after all—she was the garden's special night-time guardian, keeping watch while the world slept.",
+    "cover": "/covers/story7.jpg"
+  },
+  {
+    "id": "story8",
+    "title": "Dreams in a Jar",
+    "content": "Oliver collected interesting things in jars—seashells, colorful stones, and fireflies (which he always released before bedtime). One evening, his grandmother gave him an empty jar with tiny stars painted on it. \"This is for collecting dreams,\" she explained. \"Keep it by your bed.\" That night, Oliver dreamed of riding a dragon over mountains and valleys. When he awoke, he was amazed to find a tiny wisp of silvery mist swirling inside the jar! Each morning, Oliver found new colors in his dream jar—golden specks from dreams of treasure hunts, blue swirls from ocean adventures, and green sparkles from forest explorations. On days when Oliver felt scared or sad, he would hold his jar close, watching his dreams dance inside, reminding him that imagination can take us anywhere, even when we're awake.",
+    "cover": "/covers/story8.jpg"
+  },
+  {
+    "id": "story9",
+    "title": "The Lost Feather",
+    "content": "Pip the sparrow was born with one silver feather among his brown ones. \"It's a gift from the moon,\" his mother told him. One windy day, Pip's precious silver feather was blown away. Heartbroken, he followed it through meadows and over streams until night fell and he was lost. Exhausted, Pip rested on a windowsill where a little girl named Mia was saying her prayers. \"I'm afraid of the dark,\" she whispered. Just then, Pip's silver feather floated through her window, glowing softly like moonlight. It landed on Mia's pillow, casting a gentle glow that helped her fall asleep. Seeing how his special feather helped someone else, Pip decided to let Mia keep it. Flying home the next day, Pip discovered something wonderful—a new silver feather had grown in place of the lost one, proving that kindness always returns to us in unexpected ways.",
+    "cover": "/covers/story9.jpg"
+  },
+  {
+    "id": "story10",
+    "title": "Pebbles and the Rainbow Trail",
+    "content": "Pebbles was a small turtle who moved so slowly that flowers sometimes grew on his shell before he reached his destination. The other animals always left him behind, especially Rainbow Rabbit, the fastest animal in the forest. After a big rainstorm, a magnificent rainbow appeared, but it was fading quickly. \"Someone must follow it to find the Rainbow Pools before they disappear!\" announced Wise Owl. Rainbow Rabbit volunteered, speeding off in a flash. But the rainbow path was tricky—it went through mud that stuck to Rabbit's feet and over slippery rocks where he kept falling. Meanwhile, steady Pebbles followed slowly but surely, his shell protecting him from rain and his sturdy feet gripping the slippery path. He reached the magical Rainbow Pools first, proving that sometimes, slow and steady truly does win the race.",
+    "cover": "/covers/story10.jpg"
+  },
+  {
+    "id": "story11",
+    "title": "Night Whispers in the Lake",
+    "content": "Lily lived in a cottage by a lake that glowed with moonlight every night. While everyone else slept, Lily often sat on the dock, dangling her feet in the cool water. One night, she heard a soft voice: \"Hello there!\" It was a small turtle named Ripple. \"Would you like to see something magical?\" he asked. Ripple led Lily to a hidden cove where water lilies opened only at midnight, glowing blue and releasing tiny bubbles that floated up like stars. \"We've been waiting for someone to share our midnight bloom with,\" Ripple explained. The water lilies sang lullabies as their petals gently closed at dawn. Lily visited her new friends every night that summer, and even when winter came and she couldn't visit the lake, she would fall asleep to the memory of their whispered songs.",
+    "cover": "/covers/story11.jpg"
+  },
+  {
+    "id": "story12",
+    "title": "Timmy and the Sky Puzzle",
+    "content": "Timmy loved puzzles more than anything, but one cloudy evening, he faced his biggest challenge yet. The wind had scattered the stars across the sky in a jumbled mess! \"The night animals won't be able to find their way home,\" worried Timmy. With his telescope and star map, he began the enormous task of reorganizing the night sky. He guided each star back to its constellation—connecting the dots of the Big Dipper, arranging the belt of Orion, and completing the tail of the Little Bear. As Timmy placed the last star, the moon smiled down at him. \"Thank you,\" whispered a passing owl. \"Now I can find my nest.\" From that night on, whenever Timmy looked at the sky, the stars would twinkle in a special pattern just for him—a secret thank-you from the universe for solving its greatest puzzle.",
+    "cover": "/covers/story12.jpg"
+  },
+  {
+    "id": "story13",
+    "title": "The Star that Fell",
+    "content": "One quiet night, Eliza watched a shooting star streak across the sky and disappear behind the hills. Unlike other children who only made wishes, Eliza decided to find where the star had landed. In the morning, she packed her backpack and followed a trail of unusual sparkles through the meadow. At the end of the trail, instead of a star, she found a small, glowing creature with stardust wings. \"I fell from the sky,\" it explained sadly. \"Now I can't get back home.\" Eliza spent all day helping the star-creature build a kite big enough to carry it. When night came, they waited for the perfect breeze, and Eliza released the kite into the sky. The star-creature waved goodbye as it soared higher and higher until it rejoined its family in the night sky, leaving a trail of stardust that would sparkle in Eliza's garden for years to come.",
+    "cover": "/covers/story13.jpg"
+  },
+  {
+    "id": "story14",
+    "title": "Ellie's Cloud Garden",
+    "content": "Ellie lived in a tall apartment building where she longed for a garden, but there was no space for one. One misty morning, she noticed a fluffy cloud floating right outside her window. When Ellie reached out to touch it, her fingers sank into its softness. The cloud felt like cotton candy but was sturdy enough to hold her weight! Ellie climbed aboard and discovered she could shape the cloud like clay. She molded it into a beautiful garden with cloud-flowers and cloud-trees. Each day, the cloud returned, and Ellie added new creations—a cloud swing, a cloud pond with fish, and even a cloud puppy that followed her around. When Ellie's family finally moved to a house with a real garden, she still received visits from her cloud friends, who would drift down to play among her real flowers, leaving little rainbows wherever they touched the ground.",
+    "cover": "/covers/story14.jpg"
+  },
+  {
+    "id": "story15",
+    "title": "The Gentle Lion",
+    "content": "Leo was a young lion with a big problem—he didn't like to roar. While other lion cubs practiced their mighty roars, Leo preferred to hum soft melodies. \"How will you become king of the jungle without a roar?\" his father worried. One day, a terrible drought came to the savanna. The water hole dried up, and all the animals were thirsty and afraid. The other lions tried roaring commands, but this only scared the animals away. Leo approached the empty water hole and began to hum a gentle tune. His humming was so soothing that animals from all over the savanna gathered around him. Together they followed a trail of morning dew that Leo had discovered, leading to a hidden spring. The animals declared Leo their true leader, proving that sometimes gentleness is more powerful than the loudest roar.",
+    "cover": "/covers/story15.jpg"
+  },
+  {
+    "id": "story16",
+    "title": "The Dream Clock",
+    "content": "In Grandpa's workshop stood an unusual clock that never told the correct time. \"It's not broken,\" Grandpa told curious Max. \"It's a Dream Clock. It doesn't count hours—it measures dreams.\" The night Grandpa gave him the clock, Max noticed its hands spinning backward as he fell asleep. Suddenly, he was inside the clock itself, where each number led to a different dreamland! The number 3 took him underwater to meet mermaids, 7 led to a castle in the clouds, and 12 opened to a garden where flowers sang lullabies. Each morning, the clock's hands pointed to the number of the dream he'd visited. On his birthday, Max discovered a tiny door on the clock's back with a note: \"For creating your own dreams.\" Now Max not only visits dreamlands but creates new ones that other dreamers can explore when the Dream Clock's hands spin just for them.",
+    "cover": "/covers/story16.jpg"
+  },
+  {
+    "id": "story17",
+    "title": "Whale's Midnight Song",
+    "content": "Willow the whale had the most beautiful voice in the ocean, but she was too shy to sing when others were listening. Each midnight, when the sea creatures slept, she would swim to the surface and sing softly to the stars. Unknown to Willow, her midnight songs were helping a little boy named Sam who lived in a lighthouse and couldn't sleep because of nightmares. One night, curious about the beautiful music that soothed him to sleep, Sam sailed his small boat out to find its source. When Willow saw Sam, she dove underwater in shyness. \"Please don't go,\" Sam called. \"Your songs keep my bad dreams away.\" Touched by his words, Willow overcame her shyness and began singing just for Sam. Soon, other sea creatures joined her chorus, and children from the coastal village came to listen. Willow's midnight concerts became famous, bringing sweet dreams to everyone who heard them.",
+    "cover": "/covers/story17.jpg"
+  },
+  {
+    "id": "story18",
+    "title": "Tara the Tiny Firefly",
+    "content": "Tara was the smallest firefly in the meadow with the faintest light. While other fireflies dazzled the night with bright flashes, Tara's light was barely visible. \"Your light is too dim to matter,\" the other fireflies told her. One foggy night, a lost baby rabbit named Hop couldn't find his way home. The bright fireflies tried to help, but their harsh flashing lights only confused and frightened him more. Tara approached gently, her soft glow creating a gentle path that didn't hurt Hop's eyes. \"I can follow your light,\" Hop whispered gratefully. Tara led him safely home, and word spread about the firefly with the perfect guiding light. Soon, Tara became the meadow's official guide on foggy nights, teaching everyone that sometimes the gentlest light shines exactly where it's needed most.",
+    "cover": "/covers/story18.jpg"
+  },
+  {
+    "id": "story19",
+    "title": "The Owl's Secret Letter",
+    "content": "Oliver the owl was known as the forest's wisest messenger, delivering important letters between animals. One evening, he received a mysterious golden envelope addressed simply: \"To the One Who Needs This Most.\" Oliver was puzzled—how would he know who needed it most? He visited Fox, who was preparing a feast, and Squirrel, who was counting acorns, but both seemed content. As night fell, Oliver heard soft crying. Following the sound, he found a young bear cub alone by a stream. \"I'm lost,\" the cub sniffled. Oliver remembered the letter and felt a strange warmth from the envelope. When the cub opened it, golden light spilled out, forming a glowing path through the forest that led directly to his waiting family. The letter itself contained just one word: \"Home.\" Oliver realized that sometimes, the most important messages find their way to exactly who needs them, at exactly the right moment.",
+    "cover": "/covers/story19.jpg"
+  },
+  {
+    "id": "story20",
+    "title": "The Blanket of Stars",
+    "content": "Maya couldn't sleep without her special blanket, but one windy night, it blew away from the clothesline and disappeared into the dark sky. Heartbroken, Maya gazed out her window, wondering where her blanket had gone. Suddenly, a moonbeam touched her windowsill, and Moon herself spoke: \"Your blanket was so beautiful that the night sky wanted to wear it.\" Looking up, Maya realized the stars were arranged exactly like the pattern on her lost blanket! \"Can I have it back?\" Maya asked. Moon smiled gently. \"The sky will borrow it at night when you're asleep, but each morning, look under your pillow.\" When Maya awoke, she found a small piece of her blanket under her pillow, sparkling with stardust. Each night, she watched her blanket-of-stars overhead, and each morning, another piece returned until it was whole again—now magically able to show her the constellations whenever she snuggled under it.",
+    "cover": "/covers/story20.jpg"
+  }
+            ];
+        }
+        
+        // Create a story card element
+        function createStoryCard(story) {
+            const card = document.createElement('div');
+            card.className = 'story-card';
+            
+            // Set click handler to navigate to story player
+            card.onclick = () => {
+                window.location.href = `story-player.html?id=${story.id}`;
+            };
+            
+            // Handle story cover image
+            let coverImage = story.cover || story.coverImage || 'covers/default.jpg';
+            if (coverImage && 
+                !coverImage.startsWith('http') && 
+                !coverImage.startsWith('https') && 
+                !coverImage.startsWith('data:') && 
+                !coverImage.startsWith('/')) {
+                coverImage = '/' + coverImage;
+            }
+            
+            // Create story content preview
+            const content = story.content 
+                ? story.content.substring(0, 100) + '...' 
+                : 'No description available...';
+            
+            // Set age range
+            const ageRange = story.ageRange || 'Ages 2-5';
+            
+            // Build card HTML
+            card.innerHTML = `
+                <div class="story-image">
+                    <img src="${coverImage}" alt="${story.title}" onerror="this.src='covers/default.jpg'">
+                </div>
+                <div class="story-content">
+                    <h3 class="story-title">${story.title}</h3>
+                    <p class="story-description">${content}</p>
+                    <div class="story-footer">
+                        <span class="story-age">${ageRange}</span>
+                        <i class="fas fa-play-circle story-play"></i>
+                    </div>
+                </div>
+            `;
+            
+            return card;
+        }
+        
+        // Setup login system
+        function setupLoginSystem() {
+            const loginButton = document.getElementById('login-button');
+            const logoutButton = document.getElementById('logout-button');
+            const loginModal = document.getElementById('login-modal');
+            const closeModal = document.querySelector('.close-modal');
+            const loginForm = document.getElementById('login-form');
+            
+            // Check if user is already logged in
+            updateUserInterface();
+            
+            // Open login modal
+            loginButton.addEventListener('click', function() {
+                loginModal.style.display = 'flex';
             });
             
-            // 更新订阅计划描述
-            function updateSubscriptionPlansDescription() {
-                // 获取所有计划卡片
-                const planCards = document.querySelectorAll('.plan-card');
-                
-                if (planCards.length >= 3) {
-                    // 更新 Free Plan (默认)
-                    const freePlanFeatures = `
-                        <li><i class="fas fa-check"></i> Access to 5 stories</li>
-                        <li><i class="fas fa-check"></i> Up to 3 minutes per story</li>
-                        <li><i class="fas fa-check"></i> Basic voice features</li>
-                    `;
-                    
-                    // 更新 Starter Plan
-                    const starterPlanFeatures = planCards[0].querySelector('.plan-features ul');
-                    if (starterPlanFeatures) {
-                        starterPlanFeatures.innerHTML = `
-                            <li><i class="fas fa-check"></i> Access to 30 stories</li>
-                            <li><i class="fas fa-check"></i> Up to 90 minutes total</li>
-                            <li><i class="fas fa-check"></i> Basic voice customization</li>
-                        `;
-                    }
-                    
-                    // 更新 Plus Plan
-                    const plusPlanFeatures = planCards[1].querySelector('.plan-features ul');
-                    if (plusPlanFeatures) {
-                        plusPlanFeatures.innerHTML = `
-                            <li><i class="fas fa-check"></i> Access to 100 stories</li>
-                            <li><i class="fas fa-check"></i> Up to 300 minutes total</li>
-                            <li><i class="fas fa-check"></i> Advanced voice customization</li>
-                            <li><i class="fas fa-check"></i> Upload 5 custom stories</li>
-                        `;
-                    }
-                    
-                    // 更新 Pro Plan
-                    const proPlanFeatures = planCards[2].querySelector('.plan-features ul');
-                    if (proPlanFeatures) {
-                        proPlanFeatures.innerHTML = `
-                            <li><i class="fas fa-check"></i> Access to 300 stories</li>
-                            <li><i class="fas fa-check"></i> Up to 900 minutes total</li>
-                            <li><i class="fas fa-check"></i> Premium voice customization</li>
-                            <li><i class="fas fa-check"></i> Upload unlimited custom stories</li>
-                            <li><i class="fas fa-check"></i> Perfect for educators & creators</li>
-                        `;
-                    }
-                }
-            }
+            // Close login modal
+            closeModal.addEventListener('click', function() {
+                loginModal.style.display = 'none';
+            });
             
-            // 添加订阅模拟面板（仅开发环境使用）
-            function addSubscriptionSimulationPanel() {
-                // 检查是否为开发环境
-                const isDevelopment = window.location.hostname === 'localhost' || 
-                                     window.location.hostname === '127.0.0.1' ||
-                                     window.location.hostname === '';
-                
-                if (isDevelopment) {
-                    // 创建模拟面板按钮
-                    const simulationButton = document.createElement('button');
-                    simulationButton.textContent = 'Subscription Simulator';
-                    simulationButton.style.position = 'fixed';
-                    simulationButton.style.bottom = '20px';
-                    simulationButton.style.right = '20px';
-                    simulationButton.style.zIndex = '9999';
-                    simulationButton.style.padding = '10px 15px';
-                    simulationButton.style.backgroundColor = '#e86ed0';
-                    simulationButton.style.color = 'white';
-                    simulationButton.style.border = 'none';
-                    simulationButton.style.borderRadius = '5px';
-                    simulationButton.style.cursor = 'pointer';
-                    simulationButton.style.boxShadow = '0 2px 5px rgba(0,0,0,0.2)';
-                    
-                    // 点击事件
-                    simulationButton.addEventListener('click', function() {
-                        showSubscriptionSimulator();
-                    });
-                    
-                    // 添加到页面
-                    document.body.appendChild(simulationButton);
+            // Close modal when clicking outside
+            window.addEventListener('click', function(event) {
+                if (event.target === loginModal) {
+                    loginModal.style.display = 'none';
                 }
-            }
+            });
             
-            // 显示订阅模拟器
-            function showSubscriptionSimulator() {
-                // 获取当前订阅状态
-                const currentPlan = localStorage.getItem('userPlan') || 'free';
-                const playCount = localStorage.getItem('playCount') || 0;
+            // Handle login form submission
+            loginForm.addEventListener('submit', function(event) {
+                event.preventDefault();
                 
-                // 创建模拟器面板
-                const panel = document.createElement('div');
-                panel.style.position = 'fixed';
-                panel.style.top = '50%';
-                panel.style.left = '50%';
-                panel.style.transform = 'translate(-50%, -50%)';
-                panel.style.backgroundColor = 'white';
-                panel.style.padding = '20px';
-                panel.style.borderRadius = '10px';
-                panel.style.boxShadow = '0 5px 15px rgba(0,0,0,0.3)';
-                panel.style.zIndex = '10000';
-                panel.style.minWidth = '300px';
+                const email = document.getElementById('email').value;
+                const nickname = document.getElementById('nickname').value;
+                const userPlan = document.getElementById('subscription').value;
                 
-                // 面板内容
-                panel.innerHTML = `
-                    <h3 style="margin-top:0;color:#5a3d5c;">Subscription Simulator</h3>
-                    <p>Current Plan: <strong>${currentPlan}</strong></p>
-                    <p>Play Count: <strong>${playCount}</strong></p>
-                    
-                    <div style="margin:15px 0;">
-                        <label style="display:block;margin-bottom:5px;color:#5a3d5c;">Select Plan:</label>
-                        <select id="plan-selector" style="width:100%;padding:8px;border-radius:5px;border:1px solid #ddd;">
-                            <option value="free" ${currentPlan === 'free' ? 'selected' : ''}>Free</option>
-                            <option value="starter" ${currentPlan === 'starter' ? 'selected' : ''}>Starter</option>
-                            <option value="plus" ${currentPlan === 'plus' ? 'selected' : ''}>Plus</option>
-                            <option value="pro" ${currentPlan === 'pro' ? 'selected' : ''}>Pro</option>
-                        </select>
-                    </div>
-                    
-                    <div style="margin:15px 0;">
-                        <label style="display:block;margin-bottom:5px;color:#5a3d5c;">Play Count:</label>
-                        <input type="number" id="play-count-input" value="${playCount}" style="width:100%;padding:8px;border-radius:5px;border:1px solid #ddd;">
-                    </div>
-                    
-                    <div style="display:flex;justify-content:space-between;margin-top:20px;">
-                        <button id="reset-button" style="padding:8px 15px;background:#a1d2ce;color:white;border:none;border-radius:5px;cursor:pointer;">Reset Count</button>
-                        <button id="save-button" style="padding:8px 15px;background:#e86ed0;color:white;border:none;border-radius:5px;cursor:pointer;">Save Changes</button>
-                        <button id="close-button" style="padding:8px 15px;background:#f0f0f0;color:#333;border:none;border-radius:5px;cursor:pointer;">Close</button>
-                    </div>
-                `;
+                // Create user object
+                const user = {
+                    email: email,
+                    nickname: nickname,
+                    userPlan: userPlan
+                };
                 
-                // 添加到页面
-                document.body.appendChild(panel);
+                // Save user to localStorage
+                localStorage.setItem('user', JSON.stringify(user));
                 
-                // 添加事件监听
-                document.getElementById('save-button').addEventListener('click', function() {
-                    const selectedPlan = document.getElementById('plan-selector').value;
-                    const newPlayCount = document.getElementById('play-count-input').value;
-                    
-                    localStorage.setItem('userPlan', selectedPlan);
-                    localStorage.setItem('playCount', newPlayCount);
-                    
-                    alert(`Settings saved!\nPlan: ${selectedPlan}\nPlay Count: ${newPlayCount}`);
-                    document.body.removeChild(panel);
-                });
-                
-                document.getElementById('reset-button').addEventListener('click', function() {
-                    document.getElementById('play-count-input').value = 0;
-                });
-                
-                document.getElementById('close-button').addEventListener('click', function() {
-                    document.body.removeChild(panel);
-                });
-            }
-            
-            // 检查并重置每月播放次数
-            function checkAndResetMonthlyPlayCount() {
-                const lastResetDate = localStorage.getItem('lastPlayCountReset');
-                const currentDate = new Date();
-                
-                // 如果没有重置日期或者当前月份与上次重置月份不同
-                if (!lastResetDate || new Date(lastResetDate).getMonth() !== currentDate.getMonth()) {
-                    localStorage.setItem('playCount', 0);
-                    localStorage.setItem('lastPlayCountReset', currentDate.toString());
-                    console.log('Monthly play count has been reset');
+                // Initialize play count if not exists
+                if (!localStorage.getItem(`playCount_${email}`)) {
+                    localStorage.setItem(`playCount_${email}`, '0');
                 }
-            }
+                
+                // Update UI
+                updateUserInterface();
+                
+                // Close modal
+                loginModal.style.display = 'none';
+                
+                console.log(`User logged in: ${nickname} (${email}) with ${userPlan} plan`);
+                
+                // Fetch user subscription data if available
+                fetchUserSubscription(email);
+            });
             
-            // 页面加载时检查是否需要重置计数
-            checkAndResetMonthlyPlayCount();
-
-            // 在现有的登录处理函数中添加获取订阅信息的逻辑
-// 找到处理登录表单提交的代码部分，通常在 setupLoginSystem 函数中
-
-// 处理登录表单提交
-loginForm.addEventListener('submit', function(event) {
-    event.preventDefault();
-    
-    const email = document.getElementById('email').value;
-    const nickname = document.getElementById('nickname').value;
-    const userPlan = document.getElementById('subscription').value;
-    
-    // 创建用户对象
-    const user = {
-        email: email,
-        nickname: nickname,
-        userPlan: userPlan // 初始使用表单中选择的计划
-    };
-    
-    // 保存用户信息
-    localStorage.setItem('user', JSON.stringify(user));
-    
-    // 初始化用户播放次数（如果不存在）
-    if (!localStorage.getItem(`playCount_${email}`)) {
-        localStorage.setItem(`playCount_${email}`, '0');
-    }
-    
-    // 更新界面
-    updateUserInterface();
-    
-    // 关闭模态框
-    loginModal.style.display = 'none';
-    
-    console.log(`User logged in: ${nickname} (${email}) with ${userPlan} plan`);
-    
-    // 新增：获取用户的实际订阅信息
-    fetchUserSubscription(email);
-});
-
-// 添加获取用户订阅信息的函数
-function fetchUserSubscription(email) {
-    if (!email) return;
-    
-    fetch(`/api/user-plan?email=${encodeURIComponent(email)}`)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Failed to fetch subscription data');
-            }
-            return response.json();
-        })
-        .then(data => {
-            if (data && data.userPlan) {
-                // 获取当前用户信息
-                const userJson = localStorage.getItem('user');
-                if (userJson) {
-                    const user = JSON.parse(userJson);
-                    
-                    // 只有当订阅计划不同时才更新
-                    if (user.userPlan !== data.userPlan) {
-                        user.userPlan = data.userPlan;
-                        localStorage.setItem('user', JSON.stringify(user));
-                        console.log(`Updated user subscription to: ${data.userPlan}`);
-                        
-                        // 更新界面显示
-                        updateUserInterface();
-                    }
-                }
-            }
-        })
-        .catch(error => {
-            console.error('Error fetching subscription:', error);
-            // 失败时保持原有订阅计划，不做任何更改
-        });
-}
-
-// 修改 updateUserInterface 函数，确保在页面加载时也检查订阅状态
-function updateUserInterface() {
-    const user = JSON.parse(localStorage.getItem('user'));
-    const loginButton = document.getElementById('login-button');
-    const userInfo = document.getElementById('user-info');
-    const userGreeting = document.getElementById('user-greeting');
-    
-    if (user) {
-        // 用户已登录 - 显示用户信息
-        loginButton.style.display = 'none';
-        userInfo.style.display = 'block';
-        userGreeting.textContent = `Hi, ${user.nickname}! [${user.userPlan.charAt(0).toUpperCase() + user.userPlan.slice(1)}]`;
+            // Handle logout
+            logoutButton.addEventListener('click', function() {
+                // Remove user from localStorage
+                localStorage.removeItem('user');
+                
+                // Update UI
+                updateUserInterface();
+                
+                console.log('User logged out');
+            });
+        }
         
-        // 如果用户已登录，检查订阅状态
-        fetchUserSubscription(user.email);
-    } else {
-        // 用户未登录 - 显示登录按钮
-        loginButton.style.display = 'block';
-        userInfo.style.display = 'none';
-    }
-}
-        </script>
+        // Update user interface based on login state
+        function updateUserInterface() {
+            const user = JSON.parse(localStorage.getItem('user'));
+            const loginButton = document.getElementById('login-button');
+            const userInfo = document.getElementById('user-info');
+            const userGreeting = document.getElementById('user-greeting');
+            
+            if (user) {
+                // User is logged in - show user info
+                loginButton.style.display = 'none';
+                userInfo.style.display = 'block';
+                userGreeting.textContent = `Hi, ${user.nickname}! [${user.userPlan.charAt(0).toUpperCase() + user.userPlan.slice(1)}]`;
+                
+                // If user is logged in, check subscription status
+                fetchUserSubscription(user.email);
+            } else {
+                // User is not logged in - show login button
+                loginButton.style.display = 'block';
+                userInfo.style.display = 'none';
+            }
+        }
+        
+        // Fetch user subscription data from API (or simulate it)
+        function fetchUserSubscription(email) {
+            if (!email) return;
+            
+            // In a real app, this would be an API call
+            // For now, we'll simulate it with a timeout
+            setTimeout(() => {
+                try {
+                    // Get current user info
+                    const userJson = localStorage.getItem('user');
+                    if (userJson) {
+                        const user = JSON.parse(userJson);
+                        console.log(`Checked subscription for user: ${user.email}`);
+                    }
+                } catch (error) {
+                    console.error('Error checking subscription:', error);
+                }
+            }, 500);
+        }
+        
+        // Generate a unique ID
+        function generateUUID() {
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                var r = Math.random() * 16 | 0,
+                    v = c == 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            });
+        }
+        
+        // Initialize anonymous user ID
+        function initAnonymousUser() {
+            // Check if user is logged in
+            const user = JSON.parse(localStorage.getItem('user'));
+            if (user) {
+                console.log('User is logged in, using user ID');
+                return;
+            }
+            
+            // Check if anonymous ID exists
+            let anonymousUID = localStorage.getItem('anonymousUID');
+            if (!anonymousUID) {
+                // Generate new anonymous ID
+                anonymousUID = generateUUID();
+                localStorage.setItem('anonymousUID', anonymousUID);
+                console.log('Generated new anonymous UID:', anonymousUID);
+                
+                // Initialize play count
+                localStorage.setItem(`playCount_${anonymousUID}`, '0');
+            } else {
+                console.log('Using existing anonymous UID');
+            }
+        }
+        
+        // Check and reset monthly play count
+        function checkAndResetMonthlyPlayCount() {
+            const lastResetDate = localStorage.getItem('lastPlayCountReset');
+            const currentDate = new Date();
+            
+            // If no reset date or current month differs from last reset month
+            if (!lastResetDate || new Date(lastResetDate).getMonth() !== currentDate.getMonth()) {
+                // Reset all play counts
+                const keys = Object.keys(localStorage);
+                for (let key of keys) {
+                    if (key.startsWith('playCount_')) {
+                        localStorage.setItem(key, '0');
+                    }
+                }
+                
+                localStorage.setItem('lastPlayCountReset', currentDate.toString());
+                console.log('Monthly play counts have been reset');
+            }
+        }
+        
+        // Update subscription plans description
+        function updateSubscriptionPlansDescription() {
+            // This function is kept for future use, but will be empty for now
+            // as the static HTML already has the correct plan descriptions
+        }
+    </script>
 </body>
 </html>
