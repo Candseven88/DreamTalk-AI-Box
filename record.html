@@ -780,3 +780,51 @@
     </script>
 </body>
 </html>
+
+// 找到处理 "Try Sample Voice" 按钮的代码部分，并修改如下
+
+// 定义示例语音文件路径变量，方便后续替换
+const sampleVoiceFilePath = '/sample-voice.mp3';
+
+// 修改播放示例语音的函数
+function playSampleVoice() {
+    const sampleButton = document.getElementById('sample-voice-button');
+    const originalButtonText = sampleButton.innerHTML;
+    
+    // 更改按钮状态为加载中
+    sampleButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
+    sampleButton.disabled = true;
+    
+    // 创建新的音频对象
+    const sampleAudio = new Audio(sampleVoiceFilePath);
+    
+    // 添加错误处理
+    sampleAudio.onerror = function() {
+        console.error('Failed to load sample voice audio file');
+        sampleButton.innerHTML = originalButtonText;
+        sampleButton.disabled = false;
+        alert('Sample voice is currently unavailable.');
+    };
+    
+    // 添加加载成功处理
+    sampleAudio.oncanplaythrough = function() {
+        sampleButton.innerHTML = '<i class="fas fa-volume-up"></i> Playing...';
+        sampleAudio.play()
+            .then(() => {
+                console.log('Sample voice playback started');
+            })
+            .catch(error => {
+                console.error('Error playing sample voice:', error);
+                alert('Sample voice is currently unavailable.');
+            });
+    };
+    
+    // 添加播放结束处理
+    sampleAudio.onended = function() {
+        sampleButton.innerHTML = originalButtonText;
+        sampleButton.disabled = false;
+    };
+}
+
+// 确保将此函数绑定到 "Try Sample Voice" 按钮的点击事件
+document.getElementById('sample-voice-button').addEventListener('click', playSampleVoice);
